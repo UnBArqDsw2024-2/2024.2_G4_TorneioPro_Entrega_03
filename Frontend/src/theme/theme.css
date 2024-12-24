@@ -854,31 +854,6 @@ html {
   }
 }
 
-.bg-primary {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity, 1)));
-}
-
-.bg-secondary {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-s,oklch(var(--s)/var(--tw-bg-opacity, 1)));
-}
-
-.bg-sidebar-active-btn-base {
-  --tw-bg-opacity: 1;
-  background-color: rgb(52 131 176 / var(--tw-bg-opacity, 1));
-}
-
-.bg-sidebar-active-btn-hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(77 157 202 / var(--tw-bg-opacity, 1));
-}
-
-.bg-secondary-btn-base {
-  --tw-bg-opacity: 1;
-  background-color: rgb(44 159 76 / var(--tw-bg-opacity, 1));
-}
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
