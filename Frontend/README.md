@@ -34,7 +34,7 @@ Antes de começar, instale as seguintes ferramentas no computador:
   git --version
   ```
 
-### **1.3 Docker**&#x20 (opcional);
+### **1.3 Docker** (opcional);
 
 - Baixe e instale o [Docker Desktop](https://www.docker.com/products/docker-desktop/):
 
@@ -69,6 +69,7 @@ Antes de começar, instale as seguintes ferramentas no computador:
    ```bash
    git clone <URL_DO_REPOSITORIO>
    cd <NOME_DO_REPOSITORIO>
+   cd Frontend/
    ```
 
 ### **2.2 Instalar Dependências**
