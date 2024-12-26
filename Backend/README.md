@@ -103,3 +103,84 @@ A maioria dos endpoints requer autenticação. Para acessá-los, é necessário:
    ```
    Authorization: Bearer <seu-token>
    ```
+
+## Como testar uma requisição?
+
+### Criar um organizador
+```bash
+curl -X POST http://localhost:8000/auth/register/request/ \
+-H "Content-Type: application/json" \
+-d '{
+    "username": "admin_org",
+    "email": "admin@torneio.com",
+    "password": "admin123",
+    "user_type": "organizer"
+}'
+```
+
+### Aprovar manualmente o organizador
+```bash
+docker-compose exec web python manage.py shell
+```
+
+### No shell do Django, execute:
+```bash
+from authentication.models import User
+user = User.objects.get(username='admin_org')
+user.is_approved = True
+user.save()
+exit()
+```
+
+### Fazer login com o organizador para obter o token
+```bash
+curl -X POST http://localhost:8000/auth/login/ \
+-H "Content-Type: application/json" \
+-d '{
+    "username": "admin_org",
+    "password": "admin123"
+}'
+```
+
+### Registrar um treinador (ficará pendente)
+```bash
+curl -X POST http://localhost:8000/auth/register/request/ \
+-H "Content-Type: application/json" \
+-d '{
+    "username": "trainer1",
+    "email": "trainer1@torneio.com",
+    "password": "trainer123",
+    "user_type": "trainer"
+}'
+```
+
+### Listar treinadores pendentes (como organizador)
+```bash
+curl -X GET http://localhost:8000/auth/trainers/pending/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+### Aprovar o treinador (substitua {user_id} pelo ID retornado no passo anterior)
+```bash
+curl -X POST http://localhost:8000/auth/trainers/approve/{user_id}/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+### Verificar o login do treinador aprovado
+```bash
+curl -X POST http://localhost:8000/auth/login/ \
+-H "Content-Type: application/json" \
+-d '{
+    "username": "trainer1",
+    "password": "trainer123"
+}'
+```
+
+## Observações:
+
+### - Substitua SEU_TOKEN_AQUI pelo token do organizador.
+### - Substitua {user_id} pelo ID real do treinador.
+### - Se estiver usando Windows com PowerShell, substitua \ por ` (backtick).
+### - Se estiver usando Windows com CMD, coloque cada comando em uma única linha.
+
+
