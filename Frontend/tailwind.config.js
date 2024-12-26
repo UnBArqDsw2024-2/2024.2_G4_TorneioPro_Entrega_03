@@ -13,6 +13,7 @@ export default {
             
             // FUNDO DO SITE
             "body-background": "#1E2734",
+            "body-background-to": "#1E3234",
             
             // TEXTO
             "primary-text": "#FFFFFF",
@@ -23,6 +24,7 @@ export default {
             
             // NAVBAR
             "navbar": "#1D1D1D",
+            "navbar-hover": "#2F2F2F",
             "navbar-primary-btn": {
                 base: "#4E6278",
                 hover: "#627B97",

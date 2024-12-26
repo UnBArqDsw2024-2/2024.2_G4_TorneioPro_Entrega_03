@@ -7,7 +7,7 @@ function ReactViteBase(){
     
     return(
         <div>
-            <div className="flex flex-row justify-center items-center mb-6">
+            <div className="flex flex-row justify-center items-center mb-6 mt-32">
                 <a href="https://vite.dev" target="_blank">
                     <img src={viteLogo} className="logo" alt="Vite logo"/>
                 </a>
@@ -16,10 +16,12 @@ function ReactViteBase(){
                 </a>
             </div>
             
-            <h1>Vite + React</h1>
+            <div className="flex flex-row justify-center items-center mb-6">
+                <h1 className="text-4xl">Vite + React</h1>
+            </div>
             
-            <div className="mt-8">
-                <button className="w-2/3" onClick={() => setCount((count) => count + 1)}>
+            <div className="mt-8 flex flex-col justify-center items-center">
+                <button className="w-3/4 lg:w-1/6 btn bg-navbar hover:bg-navbar-secondary-btn-base" onClick={() => setCount((count) => count + 1)}>
                     count is {count}
                 </button>
                 <p className="text-nav-primary-btn mt-8">
@@ -27,7 +29,7 @@ function ReactViteBase(){
                 </p>
             </div>
             
-            <p className="read-the-docs mt-4">
+            <p className="flex flex-row justify-center items-center read-the-docs mt-4">
                 Click on the Vite and React logos to learn more
             </p>
         </div>

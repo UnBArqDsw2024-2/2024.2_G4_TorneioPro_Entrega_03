@@ -3,6 +3,8 @@ import { createContext, useState, useEffect, useContext, ReactNode } from "react
 interface User {
     username: string;
     role: string;
+    name: string;
+    token: string;
 }
 
 interface AuthContextType {
@@ -31,7 +33,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // TODO provisória até definirmos como será o login e logout.
     const login = (username: string, password: string) => {
         if (username === "admin" && password === "123456") {
-            const userData: User = { username: "admin", role: "admin" };
+            const userData: User = { username: "admin", role: "admin", name: "Fulano", token: "ab1cde3fgh4ij2klm" };
             setUser(userData);
             localStorage.setItem("authUser", JSON.stringify(userData));
             return { success: true, message: "Login realizado com sucesso!" };
