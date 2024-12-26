@@ -37,7 +37,7 @@ const NavBar = () => {
                 <nav className="navbar bg-navbar lg:h-[77px] h-[40px] p-0 min-h-0">
                     <div className="navbar-start">
                         <div className="lg:ml-6 ml-2">
-                            {!isAuthenticated ? (
+                            {isAuthenticated ? (
                                 <p className="link hover:bg-navbar-hover rounded-full lg:p-3 p-1 lg:h-[65px] h-[33px]" onClick={() => setAberto(!Aberto)}>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@ const NavBar = () => {
                     </div>
                     <div className="navbar-center"></div>
                     <div className="navbar-end">
-                        {!isAuthenticated ? (
+                        {isAuthenticated ? (
                             <div className="flex flex-row lg:mr-6 mr-2">
                                 {/*TODO mudar rota.*/}
                                 <Link to="/"
