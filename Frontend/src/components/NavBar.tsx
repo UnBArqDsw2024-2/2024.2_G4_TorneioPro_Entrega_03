@@ -34,7 +34,7 @@ const NavBar = () => {
         <div className="drawer z-50">
             <input id="my-drawer" type="checkbox" checked={Aberto} onChange={handleCheckboxChange} className="drawer-toggle"/>
             <div className="drawer-content">
-                <nav className="navbar bg-navbar lg:h-[77px] h-[40px] p-0 min-h-0">
+                <nav className="navbar fixed top-0 bg-navbar lg:h-[77px] h-[40px] p-0 min-h-0">
                     <div className="navbar-start">
                         <div className="lg:ml-6 ml-2">
                             {isAuthenticated ? (
