@@ -1,15 +1,20 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import {API_BASE_URL} from "../util/Constants.tsx";
+import axios from "axios";
 
 interface User {
+    id: number;
     username: string;
-    role: string;
     name: string;
+    email: string;
+    role: string;
+    approved: boolean;
     token: string;
 }
 
 interface AuthContextType {
     user: User | null;
-    login: (username: string, password: string) => { success: boolean; message: string };
+    login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -30,15 +35,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }, []);
     
-    // TODO provisória até definirmos como será o login e logout.
-    const login = (username: string, password: string) => {
-        if (username === "admin" && password === "123456") {
-            const userData: User = { username: "admin", role: "admin", name: "Fulano", token: "ab1cde3fgh4ij2klm" };
+    const login = async (username: string, password: string) => {
+        const body = {
+            username: username,
+            password: password,
+        };
+        
+        try {
+            
+            const response = await axios.post(`${API_BASE_URL}/auth/login/`, body);
+            
+            const userData: User = {
+                id: response.data.user.id,
+                username,
+                name: response.data.user.name ?? "Unknown", // TODO avisar pessoal do Back para armazenar Nome também.
+                email: response.data.user.email,
+                role: response.data.user.user_type,
+                approved: response.data.user.is_approved,
+                token: response.data.token,
+            };
+            
             setUser(userData);
             localStorage.setItem("authUser", JSON.stringify(userData));
+            
             return { success: true, message: "Login realizado com sucesso!" };
+        } catch (erro) {
+            return { success: false, message: "Credenciais inválidas" };
         }
-        return { success: false, message: "Usuário ou senha inválidos" };
     };
     
     const logout = () => {
