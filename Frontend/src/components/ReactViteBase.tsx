@@ -3,7 +3,7 @@ import reactLogo from "../assets/react.svg";
 import {useState} from "react";
 import {useAuth} from "../context/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
-import HorizontalSlider, {SliderColors} from "./HorizontalSlider.tsx"; 
+import HorizontalSlider, {SliderColors} from "./HorizontalSlider.tsx";
 
 function ReactViteBase(){
     const [count, setCount] = useState(0)
@@ -20,8 +20,15 @@ function ReactViteBase(){
         navigate("/login");
     }
     const handleLogin = async () => {
-        const response = await login(user, password);
+        const response = await login(user, password, false);
         
+        if(!response.success) setMessage(response.message);
+        else navigate("/dashboard");
+    }
+    
+    const handleLoginPeba = async () => {
+        const response = await login(user, password, true);
+
         if(!response.success) setMessage(response.message);
         else navigate("/dashboard");
     }
@@ -32,8 +39,8 @@ function ReactViteBase(){
             id: 1,
             name: "Campeonato Tal de Tal", 
             type: "Futebol",
-            open: "Sat Dec 28 2024 15:00:00 GMT",
-            close: "Sat Dec 28 2024 17:40:00 GMT",
+            open: "Sat Dec 28 2023 15:00:00 GMT",
+            close: "Sat Dec 28 2025 17:40:00 GMT",
             matches: [
                 {
                     id: 1,
@@ -43,8 +50,8 @@ function ReactViteBase(){
                     point2: 1,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sat Dec 28 2024 15:00:00 GMT",
-                    close: "Sat Dec 28 2024 16:10:00 GMT",
+                    open: "Sat Dec 28 2023 15:00:00 GMT",
+                    close: "Sat Dec 28 2025 16:10:00 GMT",
                 },
                 {
                     id: 2,
@@ -116,8 +123,8 @@ function ReactViteBase(){
             id: 1,
             name: "Campeonato Tal de Tal",
             type: "Futebol",
-            open: "Sat Dec 28 2024 15:00:00 GMT",
-            close: "Sat Dec 28 2024 17:40:00 GMT",
+            open: "Sat Dec 28 2023 15:00:00 GMT",
+            close: "Sat Dec 28 2025 17:40:00 GMT",
             matches: [
                 {
                     id: 1,
@@ -127,8 +134,8 @@ function ReactViteBase(){
                     point2: 1,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sat Dec 28 2024 15:00:00 GMT",
-                    close: "Sat Dec 28 2024 16:10:00 GMT",
+                    open: "Sat Dec 28 2023 15:00:00 GMT",
+                    close: "Sat Dec 28 2025 16:10:00 GMT",
                 },
                 {
                     id: 2,
@@ -200,9 +207,10 @@ function ReactViteBase(){
     
     return(
         <div className="mt-28 mb-28">
-            <HorizontalSlider title={"Campeonatos Individuais"} championships={championships} color={SliderColors.light} children={<p>FILHO</p>}/>
-            
-            <div className="flex flex-row justify-center items-center mb-6">
+            <HorizontalSlider title={"Campeonatos Individuais"} championships={championships}
+                              color={SliderColors.light}/>
+
+            <div className="flex flex-row justify-center items-center mt-16 mb-6">
                 <a href="https://vite.dev" target="_blank">
                     <img src={viteLogo} className="logo" alt="Vite logo"/>
                 </a>
@@ -210,11 +218,11 @@ function ReactViteBase(){
                     <img src={reactLogo} className="logo react" alt="React logo"/>
                 </a>
             </div>
-            
+
             <div className="flex flex-row justify-center items-center mb-6">
                 <h1 className="text-4xl">Vite + React</h1>
             </div>
-            
+
             <div className="mt-8 flex flex-col justify-center items-center">
                 <button className="w-3/4 lg:w-1/6 btn bg-navbar hover:bg-navbar-secondary-btn-base"
                         onClick={() => setCount((count) => count + 1)}>
@@ -224,16 +232,17 @@ function ReactViteBase(){
                     Edit <code>src/App.tsx</code> and save to test HRM
                 </p>
             </div>
-            
+
             <p className="flex flex-row justify-center items-center read-the-docs mt-4">
                 Click on the Vite and React logos to learn more
             </p>
-            
+
             <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
                 <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
-                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o Backend.
+                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o
+                    Backend.
                 </p>
-            
+
                 <label className="input input-bordered flex items-center gap-2">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -246,7 +255,7 @@ function ReactViteBase(){
                     <input type="text" className="grow" placeholder="Usuário" value={user}
                            onChange={e => setUser(e.target.value)}/>
                 </label>
-            
+
                 <label className="input input-bordered flex items-center gap-2">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -261,15 +270,34 @@ function ReactViteBase(){
                     <input type="password" className="grow" placeholder="Senha" value={password}
                            onChange={e => setPassword(e.target.value)}/>
                 </label>
-            
+
                 <button
                     onClick={() => handleLogin()}
                     className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
                     Simular Login
                 </button>
-            
+
                 <p className="text-lg text-secondary">{message}</p>
-            
+
+                <button
+                    onClick={() => handleLogout()}
+                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
+                    Simular Logout
+                </button>
+            </div>
+
+            <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
+                <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
+                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), sem utilizar o
+                    Backend.
+                </p>
+
+                <button
+                    onClick={() => handleLoginPeba()}
+                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
+                    Simular Login
+                </button>
+
                 <button
                     onClick={() => handleLogout()}
                     className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
