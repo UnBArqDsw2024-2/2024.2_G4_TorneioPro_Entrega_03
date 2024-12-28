@@ -274,7 +274,7 @@ function ReactViteBase(){
                 <button
                     onClick={() => handleLogin()}
                     className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
-                    Simular Login
+                    Login
                 </button>
 
                 <p className="text-lg text-secondary">{message}</p>
@@ -282,7 +282,7 @@ function ReactViteBase(){
                 <button
                     onClick={() => handleLogout()}
                     className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
-                    Simular Logout
+                    Logout
                 </button>
             </div>
 
