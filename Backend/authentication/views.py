@@ -19,6 +19,13 @@ def login(request):
         user = authenticate(username=username, password=password)
         
         if user:
+            # Check if user is a trainer and not approved
+            if user.user_type == 'trainer' and not user.is_approved:
+                return Response(
+                    {'error': 'Your trainer account is pending approval'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
             refresh = RefreshToken.for_user(user)
             return Response({
                 'token': str(refresh.access_token),
