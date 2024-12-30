@@ -1,10 +1,13 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from . import views
 
-router = DefaultRouter()
-router.register(r'', views.PlayerViewSet, basename='player')
-
 urlpatterns = [
-    path('', include(router.urls)),
+    # List and Create endpoints
+    path('list/', views.PlayerViewSet.as_view({'get': 'list'}), name='player-list'),
+    path('create/', views.PlayerViewSet.as_view({'post': 'create'}), name='player-create'),
+    
+    # Body-based action endpoints
+    path('get/', views.PlayerViewSet.as_view({'post': 'get_player'}), name='player-get'),
+    path('update/', views.PlayerViewSet.as_view({'post': 'update_player'}), name='player-update'),
+    path('delete/', views.PlayerViewSet.as_view({'post': 'delete_player'}), name='player-delete'),
 ]

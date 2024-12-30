@@ -11,35 +11,83 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
     serializer_class = ChampionshipSerializer
     permission_classes = [IsAuthenticated]
 
-    @action(detail=True, methods=['post'])
-    def join_request(self, request, pk=None):
-        championship = self.get_object()
-        team = request.user.team  # Assuming user has a team
-        if team in championship.teams.all():
-            return Response({"error": "Team already in championship"}, 
-                          status=status.HTTP_400_BAD_REQUEST)
-        championship.teams.add(team)
-        return Response({"message": "Join request successful"})
+    @action(detail=False, methods=['post'])
+    def get_championship(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            serializer = self.get_serializer(championship)
+            return Response(serializer.data)
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['post'])
-    def addteams(self, request, pk=None):
-        championship = self.get_object()
-        team_ids = request.data.get('team_ids', [])
-        teams = Team.objects.filter(id__in=team_ids)
-        championship.teams.add(*teams)
-        return Response({"message": "Teams added successfully"})
+    @action(detail=False, methods=['post'])
+    def update_championship(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            serializer = self.get_serializer(championship, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['post'])
-    def remteams(self, request, pk=None):
-        championship = self.get_object()
-        team_ids = request.data.get('team_ids', [])
-        teams = Team.objects.filter(id__in=team_ids)
-        championship.teams.remove(*teams)
-        return Response({"message": "Teams removed successfully"})
+    @action(detail=False, methods=['post'])
+    def delete_championship(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            championship.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['post'])
-    def close(self, request, pk=None):
-        championship = self.get_object()
-        championship.is_active = False
-        championship.save()
-        return Response({"message": "Championship closed successfully"})
+    @action(detail=False, methods=['post'])
+    def join_request(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            team = request.user.team
+            if team in championship.teams.all():
+                return Response({"error": "Team already in championship"}, status=status.HTTP_400_BAD_REQUEST)
+            championship.teams.add(team)
+            return Response({"message": "Join request successful"})
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['post'])
+    def addteams(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            team_ids = request.data.get('team_ids', [])
+            teams = Team.objects.filter(id__in=team_ids)
+            championship.teams.add(*teams)
+            return Response({"message": "Teams added successfully"})
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['post'])
+    def remteams(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            team_ids = request.data.get('team_ids', [])
+            teams = Team.objects.filter(id__in=team_ids)
+            championship.teams.remove(*teams)
+            return Response({"message": "Teams removed successfully"})
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['post'])
+    def close(self, request):
+        championship_id = request.data.get('championship_id')
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            championship.is_active = False
+            championship.save()
+            return Response({"message": "Championship closed successfully"})
+        except Championship.DoesNotExist:
+            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)

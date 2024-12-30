@@ -43,136 +43,139 @@ docker-compose down
 - `GET /auth/trainers/pending` - Lista treinadores pendentes de aprovação (apenas organizadores)
   - Requer autenticação de organizador
   - Retorna: Lista de treinadores pendentes
-- `POST /auth/trainers/approve/{user_id}` - Aprova um treinador (apenas organizadores)
+- `POST /auth/trainers/approve` - Aprova um treinador (apenas organizadores)
+  - Body: { "trainer_id": number, "approved": boolean }
   - Requer autenticação de organizador
   - Retorna: Dados do treinador aprovado
 
 ### Campeonatos
-- `GET /championships/` - Lista todos os campeonatos
-- `POST /championships/` - Cria novo campeonato
-- `GET /championships/{id}` - Obtém detalhes de um campeonato específico
-- `POST /championships/join/request` - Solicita entrada em campeonato
-- `POST /championships/addteams/{[idTime]}` - Adiciona times ao campeonato
-- `POST /championships/remteams/{[idTime]}` - Remove times do campeonato
-- `PUT /championships/{id}` - Atualiza campeonato
-- `DELETE /championships/{id}` - Deleta campeonato
-- `POST /championships/close/{id}` - Encerra campeonato
+- `GET /championships/list` - Lista todos os campeonatos
+- `POST /championships/create` - Cria novo campeonato
+  - Body: { "name": "string", "description": "string", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" }
+- `POST /championships/get` - Obtém detalhes de um campeonato específico
+  - Body: { "championship_id": number }
+- `POST /championships/update` - Atualiza campeonato
+  - Body: { "championship_id": number, ...dados_para_atualizar }
+- `POST /championships/delete` - Deleta campeonato
+  - Body: { "championship_id": number }
+- `POST /championships/join` - Solicita entrada em campeonato
+  - Body: { "championship_id": number }
+- `POST /championships/addteams` - Adiciona times ao campeonato
+  - Body: { "championship_id": number, "team_ids": [number] }
+- `POST /championships/remteams` - Remove times do campeonato
+  - Body: { "championship_id": number, "team_ids": [number] }
+- `POST /championships/close` - Encerra campeonato
+  - Body: { "championship_id": number }
 
 ### Times
-- `GET /teams/` - Lista todos os times
-- `GET /teams/{idTreinador}` - Lista times de um treinador
-- `POST /teams/` - Cria novo time
-- `GET /teams/{id}` - Obtém detalhes de um time específico
-- `POST /teams/addplayers/{[idJogador]}` - Adiciona jogadores ao time
-- `POST /teams/remplayers/{[idJogador]}` - Remove jogadores do time
-- `PUT /teams/{id}` - Atualiza time
-- `DELETE /teams/{id}` - Deleta time
+- `GET /teams/list` - Lista todos os times
+- `POST /teams/create` - Cria novo time
+  - Body: { "name": "string", "description": "string" }
+- `POST /teams/get` - Obtém detalhes de um time específico
+  - Body: { "team_id": number }
+- `POST /teams/update` - Atualiza time
+  - Body: { "team_id": number, ...dados_para_atualizar }
+- `POST /teams/delete` - Deleta time
+  - Body: { "team_id": number }
+- `POST /teams/add-player` - Adiciona jogador ao time
+  - Body: { "team_id": number, "player_id": number }
+- `POST /teams/remove-player` - Remove jogador do time
+  - Body: { "team_id": number, "player_id": number }
 
 ### Partidas
-- `GET /matchs/` - Lista todas as partidas
-- `POST /matchs/` - Cria nova partida
-- `GET /matchs/{id}` - Obtém detalhes de uma partida específica
-- `PUT /matchs/{id}` - Atualiza partida
-- `DELETE /matchs/{id}` - Deleta partida
+- `GET /matches/list` - Lista todas as partidas
+- `POST /matches/create` - Cria nova partida
+  - Body: { "team1_id": number, "team2_id": number, "championship_id": number, "date": "YYYY-MM-DD" }
+- `POST /matches/get` - Obtém detalhes de uma partida específica
+  - Body: { "match_id": number }
+- `POST /matches/update` - Atualiza partida
+  - Body: { "match_id": number, ...dados_para_atualizar }
+- `POST /matches/delete` - Deleta partida
+  - Body: { "match_id": number }
+- `POST /matches/set-score` - Define placar da partida
+  - Body: { "match_id": number, "team1_score": number, "team2_score": number }
 
 ### Organizadores
-- `GET /organizers/` - Lista todos os organizadores
-- `POST /organizers/` - Cria novo organizador
-- `GET /organizers/{id}` - Obtém detalhes de um organizador específico
-- `PUT /organizers/{id}` - Atualiza organizador
-- `DELETE /organizers/{id}` - Deleta organizador
+- `GET /organizers/list` - Lista todos os organizadores
+- `POST /organizers/create` - Cria novo organizador
+  - Body: { "user_id": number, ...dados_do_organizador }
+- `POST /organizers/get` - Obtém detalhes de um organizador específico
+  - Body: { "organizer_id": number }
+- `POST /organizers/update` - Atualiza organizador
+  - Body: { "organizer_id": number, ...dados_para_atualizar }
+- `POST /organizers/delete` - Deleta organizador
+  - Body: { "organizer_id": number }
 
 ### Treinadores
-- `GET /trainers/` - Lista todos os treinadores
-- `POST /trainers/` - Cria novo treinador
-- `GET /trainers/{id}` - Obtém detalhes de um treinador específico
-- `PUT /trainers/{id}` - Atualiza treinador
-- `DELETE /trainers/{id}` - Deleta treinador
+- `GET /trainers/list` - Lista todos os treinadores
+- `POST /trainers/create` - Cria novo treinador
+  - Body: { "user_id": number, ...dados_do_treinador }
+- `POST /trainers/get` - Obtém detalhes de um treinador específico
+  - Body: { "trainer_id": number }
+- `POST /trainers/update` - Atualiza treinador
+  - Body: { "trainer_id": number, ...dados_para_atualizar }
+- `POST /trainers/delete` - Deleta treinador
+  - Body: { "trainer_id": number }
 
 ### Jogadores
-- `GET /players/` - Lista todos os jogadores
-- `POST /players/` - Cria novo jogador
-- `GET /players/{id}` - Obtém detalhes de um jogador específico
-- `PUT /players/{id}` - Atualiza jogador
-- `DELETE /players/{id}` - Deleta jogador
+- `GET /players/list` - Lista todos os jogadores
+- `POST /players/create` - Cria novo jogador
+  - Body: { "user_id": number, ...dados_do_jogador }
+- `POST /players/get` - Obtém detalhes de um jogador específico
+  - Body: { "player_id": number }
+- `POST /players/update` - Atualiza jogador
+  - Body: { "player_id": number, ...dados_para_atualizar }
+- `POST /players/delete` - Deleta jogador
+  - Body: { "player_id": number }
 
 ## Autenticação
 A maioria dos endpoints requer autenticação. Para acessá-los, é necessário:
 1. Fazer login através do endpoint `/auth/login`
-2. Usar o token retornado no header das requisições:
+2. Incluir o token retornado no header de todas as requisições:
    ```
-   Authorization: Bearer <seu-token>
+   Authorization: Bearer seu_token_aqui
    ```
 
-## Como testar uma requisição?
+## Exemplos de Uso
 
-### Criar um organizador
-```bash
-curl -X POST http://localhost:8000/auth/register/request/ \
--H "Content-Type: application/json" \
--d '{
-    "username": "admin_org",
-    "email": "admin@torneio.com",
-    "password": "admin123",
-    "user_type": "organizer"
-}'
-```
-
-### Aprovar manualmente o organizador
-```bash
-docker-compose exec web python manage.py shell
-```
-
-### No shell do Django, execute:
-```bash
-from authentication.models import User
-user = User.objects.get(username='admin_org')
-user.is_approved = True
-user.save()
-exit()
-```
-
-### Fazer login com o organizador para obter o token
+### Login
 ```bash
 curl -X POST http://localhost:8000/auth/login/ \
 -H "Content-Type: application/json" \
+-d '{"email": "user@example.com", "password": "senha123"}'
+```
+
+### Criar um Campeonato
+```bash
+curl -X POST http://localhost:8000/championships/create/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Content-Type: application/json" \
 -d '{
-    "username": "admin_org",
-    "password": "admin123"
+  "name": "Torneio de Verão 2024",
+  "description": "Campeonato de verão com os melhores times",
+  "start_date": "2024-01-15",
+  "end_date": "2024-02-15"
 }'
 ```
 
-### Registrar um treinador (ficará pendente)
+### Adicionar Times ao Campeonato
 ```bash
-curl -X POST http://localhost:8000/auth/register/request/ \
+curl -X POST http://localhost:8000/championships/addteams/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
 -H "Content-Type: application/json" \
 -d '{
-    "username": "trainer1",
-    "email": "trainer1@torneio.com",
-    "password": "trainer123",
-    "user_type": "trainer"
+  "championship_id": 1,
+  "team_ids": [1, 2, 3]
 }'
 ```
 
-### Listar treinadores pendentes (como organizador)
+### Obter Detalhes de um Time
 ```bash
-curl -X GET http://localhost:8000/auth/trainers/pending/ \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
-```
-
-### Aprovar o treinador (substitua {user_id} pelo ID retornado no passo anterior)
-```bash
-curl -X POST http://localhost:8000/auth/trainers/approve/{user_id}/ \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
-```
-
-### Verificar o login do treinador aprovado
-```bash
-curl -X POST http://localhost:8000/auth/login/ \
+curl -X POST http://localhost:8000/teams/get/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
 -H "Content-Type: application/json" \
 -d '{
-    "username": "trainer1",
-    "password": "trainer123"
+  "team_id": 1
 }'
 ```
 
@@ -182,5 +185,3 @@ curl -X POST http://localhost:8000/auth/login/ \
 ### - Substitua {user_id} pelo ID real do treinador.
 ### - Se estiver usando Windows com PowerShell, substitua \ por ` (backtick).
 ### - Se estiver usando Windows com CMD, coloque cada comando em uma única linha.
-
-

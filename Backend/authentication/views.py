@@ -53,35 +53,33 @@ def register_request(request):
 
 @api_view(['POST'])
 @permission_classes([IsOrganizer])
-def approve_user(request, user_id):
+def approve_user(request):
     """
     Endpoint para organizadores aprovarem usuários pendentes.
     Apenas treinadores precisam de aprovação.
     """
-    user = get_object_or_404(User, id=user_id)
-    
-    # Verificar se o usuário é um treinador
-    if user.user_type != 'trainer':
+    user_id = request.data.get('trainer_id')
+    if not user_id:
         return Response(
-            {'error': 'Only trainer accounts require approval'},
+            {'error': 'trainer_id is required'}, 
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Verificar se o usuário já está aprovado
-    if user.is_approved:
+    try:
+        user = User.objects.get(id=user_id, user_type='trainer', is_approved=False)
+    except User.DoesNotExist:
         return Response(
-            {'error': 'User is already approved'},
-            status=status.HTTP_400_BAD_REQUEST
+            {'error': 'Trainer not found or already approved'}, 
+            status=status.HTTP_404_NOT_FOUND
         )
-    
-    # Aprovar o usuário
+
     user.is_approved = True
     user.save()
     
     return Response({
-        'message': f'Trainer {user.username} approved successfully',
+        'message': 'Trainer approved successfully',
         'user': UserSerializer(user).data
-    }, status=status.HTTP_200_OK)
+    })
 
 @api_view(['GET'])
 @permission_classes([IsOrganizer])
