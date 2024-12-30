@@ -1,31 +1,244 @@
-# RepositorioTemplate
+# TorneioPro - Sistema de Gerenciamento de Torneios
 
-Repositório que deve ser utilizado como template inicial pelos grupos da matéria de Arquitetura e Desenho de Software.
+## Descrição
+Sistema para gerenciamento de torneios esportivos, permitindo o cadastro de organizadores, treinadores, jogadores, times e campeonatos.
 
-## Introdução
+## Requisitos
+- Docker
+- Docker Compose
 
-Este repositório traz um template de repo de documentação a ser seguido pelos grupos de arquitetura e desenho de software.
+## Como executar
 
-## Tecnologia
-
-A geração do site estático é realizada utilizando o [docsify](https://docsify.js.org/).
-
-```shell
-"Docsify generates your documentation website on the fly. Unlike GitBook, it does not generate static html files. Instead, it smartly loads and parses your Markdown files and displays them as a website. To start using it, all you need to do is create an index.html and deploy it on GitHub Pages."
+1. Clone o repositório
+```bash
+git clone <repository-url>
+cd Backend
 ```
 
-### Instalando o docsify
+2. Configure as variáveis de ambiente (opcional)
+- Crie um arquivo `.env` baseado no `.env.example`
+- Ajuste as variáveis conforme necessário
 
-Execute o comando:
-
-```shell
-npm i docsify-cli -g
+3. Execute o projeto com Docker
+```bash
+docker-compose up --build
 ```
 
-### Executando localmente
+4. O servidor estará disponível em `http://localhost:8000`
 
-Para iniciar o site localmente, utilize o comando:
-
-```shell
-docsify serve ./docs
+5. Para parar o servidor
+```bash
+docker-compose down
 ```
+
+## Endpoints disponíveis
+
+### Autenticação
+- `POST /auth/login` - Login de usuário
+  - Body: { "email": "string", "password": "string" }
+  - Retorna: Token de acesso
+- `POST /auth/register/request` - Registro de novo usuário
+  - Body: { "email": "string", "password": "string", "name": "string", "role": "string" }
+  - Obs: Jogadores são aprovados automaticamente, treinadores precisam de aprovação
+- `GET /auth/trainers/pending` - Lista treinadores pendentes de aprovação (apenas organizadores)
+  - Requer autenticação de organizador
+  - Retorna: Lista de treinadores pendentes
+- `POST /auth/trainers/approve` - Aprova um treinador (apenas organizadores)
+  - Body: { "trainer_id": number, "approved": boolean }
+  - Requer autenticação de organizador
+  - Retorna: Dados do treinador aprovado
+
+### Campeonatos
+- `GET /championships/list` - Lista todos os campeonatos
+- `POST /championships/create` - Cria novo campeonato
+  - Body: { "name": "string", "description": "string", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" }
+- `POST /championships/get` - Obtém detalhes de um campeonato específico
+  - Body: { "championship_id": number }
+- `POST /championships/update` - Atualiza campeonato
+  - Body: { "championship_id": number, ...dados_para_atualizar }
+- `POST /championships/delete` - Deleta campeonato
+  - Body: { "championship_id": number }
+- `POST /championships/join` - Solicita entrada em campeonato
+  - Body: { "championship_id": number }
+- `POST /championships/addteams` - Adiciona times ao campeonato
+  - Body: { "championship_id": number, "team_ids": [number] }
+- `POST /championships/remteams` - Remove times do campeonato
+  - Body: { "championship_id": number, "team_ids": [number] }
+- `POST /championships/close` - Encerra campeonato
+  - Body: { "championship_id": number }
+
+### Times
+- `GET /teams/list` - Lista todos os times
+- `POST /teams/create` - Cria novo time
+  - Body: { "name": "string", "description": "string" }
+- `POST /teams/get` - Obtém detalhes de um time específico
+  - Body: { "team_id": number }
+- `POST /teams/update` - Atualiza time
+  - Body: { "team_id": number, ...dados_para_atualizar }
+- `POST /teams/delete` - Deleta time
+  - Body: { "team_id": number }
+- `POST /teams/add-player` - Adiciona jogador ao time
+  - Body: { "team_id": number, "player_id": number }
+- `POST /teams/remove-player` - Remove jogador do time
+  - Body: { "team_id": number, "player_id": number }
+
+### Partidas
+- `GET /matches/list` - Lista todas as partidas
+- `POST /matches/create` - Cria nova partida
+  - Body: { "team1_id": number, "team2_id": number, "championship_id": number, "date": "YYYY-MM-DD" }
+- `POST /matches/get` - Obtém detalhes de uma partida específica
+  - Body: { "match_id": number }
+- `POST /matches/update` - Atualiza partida
+  - Body: { "match_id": number, ...dados_para_atualizar }
+- `POST /matches/delete` - Deleta partida
+  - Body: { "match_id": number }
+- `POST /matches/set-score` - Define placar da partida
+  - Body: { "match_id": number, "team1_score": number, "team2_score": number }
+
+### Organizadores
+- `GET /organizers/list` - Lista todos os organizadores
+- `POST /organizers/create` - Cria novo organizador
+  - Body: { "user_id": number, ...dados_do_organizador }
+- `POST /organizers/get` - Obtém detalhes de um organizador específico
+  - Body: { "organizer_id": number }
+- `POST /organizers/update` - Atualiza organizador
+  - Body: { "organizer_id": number, ...dados_para_atualizar }
+- `POST /organizers/delete` - Deleta organizador
+  - Body: { "organizer_id": number }
+
+### Treinadores
+- `GET /trainers/list` - Lista todos os treinadores
+- `POST /trainers/create` - Cria novo treinador
+  - Body: { "user_id": number, ...dados_do_treinador }
+- `POST /trainers/get` - Obtém detalhes de um treinador específico
+  - Body: { "trainer_id": number }
+- `POST /trainers/update` - Atualiza treinador
+  - Body: { "trainer_id": number, ...dados_para_atualizar }
+- `POST /trainers/delete` - Deleta treinador
+  - Body: { "trainer_id": number }
+
+### Jogadores
+- `GET /players/list` - Lista todos os jogadores
+- `POST /players/create` - Cria novo jogador
+  - Body: { "user_id": number, ...dados_do_jogador }
+- `POST /players/get` - Obtém detalhes de um jogador específico
+  - Body: { "player_id": number }
+- `POST /players/update` - Atualiza jogador
+  - Body: { "player_id": number, ...dados_para_atualizar }
+- `POST /players/delete` - Deleta jogador
+  - Body: { "player_id": number }
+
+## Autenticação
+A maioria dos endpoints requer autenticação. Para acessá-los, é necessário:
+1. Fazer login através do endpoint `/auth/login`
+2. Incluir o token retornado no header de todas as requisições:
+   ```
+   Authorization: Bearer seu_token_aqui
+   ```
+
+## Exemplos de Uso
+
+### Login
+```bash
+curl -X POST http://localhost:8000/auth/login/ \
+-H "Content-Type: application/json" \
+-d '{"email": "user@example.com", "password": "senha123"}'
+```
+
+### Criar um Campeonato
+```bash
+curl -X POST http://localhost:8000/championships/create/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Torneio de Verão 2024",
+  "description": "Campeonato de verão com os melhores times",
+  "start_date": "2024-01-15",
+  "end_date": "2024-02-15"
+}'
+```
+
+### Adicionar Times ao Campeonato
+```bash
+curl -X POST http://localhost:8000/championships/addteams/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Content-Type: application/json" \
+-d '{
+  "championship_id": 1,
+  "team_ids": [1, 2, 3]
+}'
+```
+
+### Obter Detalhes de um Time
+```bash
+curl -X POST http://localhost:8000/teams/get/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Content-Type: application/json" \
+-d '{
+  "team_id": 1
+}'
+```
+
+## Observações:
+
+### - Substitua SEU_TOKEN_AQUI pelo token do organizador.
+### - Substitua {user_id} pelo ID real do treinador.
+### - Se estiver usando Windows com PowerShell, substitua \ por ` (backtick).
+### - Se estiver usando Windows com CMD, coloque cada comando em uma única linha.
+
+## Guia Rápido de Uso
+
+### Como criar um treinador
+1. Faça o registro como treinador:
+```bash
+curl -X POST http://localhost:8000/auth/register/request/ \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "treinador@example.com",
+  "password": "senha123",
+  "name": "João Silva",
+  "role": "trainer"
+}'
+```
+2. Aguarde a aprovação de um organizador.
+
+### Como criar um organizador
+1. Faça o registro como organizador (não precisa de aprovação):
+```bash
+curl -X POST http://localhost:8000/auth/register/request/ \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "organizador@example.com",
+  "password": "senha123",
+  "name": "Maria Santos",
+  "role": "organizer"
+}'
+```
+2. Após o registro, você já pode fazer login e começar a usar o sistema imediatamente.
+
+### Como aceitar um treinador (sendo organizador)
+1. Primeiro, faça login como organizador:
+```bash
+curl -X POST http://localhost:8000/auth/login/ \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "organizador@example.com",
+  "password": "senha123"
+}'
+```
+
+2. Liste os treinadores pendentes:
+```bash
+curl -X GET http://localhost:8000/auth/trainers/pending/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+3. Aprove um treinador específico:
+```bash
+curl -X POST http://localhost:8000/auth/trainers/approve/ \
+-H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Content-Type: application/json" \
+-d '{
+  "trainer_id": 123,
+  "approved": true
+}'
