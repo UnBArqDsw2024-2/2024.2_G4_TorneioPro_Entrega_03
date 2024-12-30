@@ -2,6 +2,13 @@ import {useState} from "react";
 import {useAuth} from "../context/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
 import HorizontalSlider, {SliderColors} from "./HorizontalSlider.tsx";
+import CardComponent from "./DashboardCard.tsx";
+import trophyIcon from "../assets/trophyImage.jpg";
+import PlayerIcon from "../assets/player.png";
+import CoachIcon from "../assets/coach.png";
+import TeamIcon from "../assets/team.png";
+import MatchIcon from "../assets/match.png";
+
 
 function ReactViteBase(){
     const {login, logout} = useAuth();
@@ -289,6 +296,14 @@ function ReactViteBase(){
                     Simular Logout
                 </button>
             </div>
+            <div className="flex flex-row gap-x-5"> 
+            <CardComponent qtd={5} title={"Campeonatos"} image={trophyIcon} /> 
+            <CardComponent qtd={4} title={"Jogadores"} image={PlayerIcon} /> 
+            <CardComponent qtd={3} title={"Treinadores"} image={CoachIcon} /> 
+            <CardComponent qtd={2} title={"Partidas"} image={MatchIcon} /> 
+            <CardComponent qtd={1} title={"Times"} image={TeamIcon} /> 
+            </div>  
+            
         </div>
     )
 }
