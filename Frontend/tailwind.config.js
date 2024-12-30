@@ -101,7 +101,7 @@ export default {
             },
             "secondary-btn": {
                 base: "#2C9F4C",
-                hover: "#37C75F",
+                hover: "#21783a",
             },
             "tertiary-btn": {
                 base: "#CD3532",

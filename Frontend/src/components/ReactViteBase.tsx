@@ -1,12 +1,9 @@
-import viteLogo from "../../public/vite.svg";
-import reactLogo from "../assets/react.svg";
 import {useState} from "react";
 import {useAuth} from "../context/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
 import HorizontalSlider, {SliderColors} from "./HorizontalSlider.tsx";
 
 function ReactViteBase(){
-    const [count, setCount] = useState(0)
     const {login, logout} = useAuth();
     const navigate = useNavigate();
     
@@ -38,9 +35,12 @@ function ReactViteBase(){
         {
             id: 1,
             name: "Campeonato Tal de Tal", 
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
             type: "Futebol",
-            open: "Sat Dec 28 2023 15:00:00 GMT",
-            close: "Sat Dec 28 2025 17:40:00 GMT",
+            start_date: "Sat Dec 28 2023 15:00:00 GMT",
+            end_date: "Sat Dec 28 2025 17:40:00 GMT",
             matches: [
                 {
                     id: 1,
@@ -50,8 +50,8 @@ function ReactViteBase(){
                     point2: 1,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sat Dec 28 2023 15:00:00 GMT",
-                    close: "Sat Dec 28 2025 16:10:00 GMT",
+                    start_date: "Sat Dec 28 2023 15:00:00 GMT",
+                    end_date: "Sat Dec 28 2025 16:10:00 GMT",
                 },
                 {
                     id: 2,
@@ -61,17 +61,20 @@ function ReactViteBase(){
                     point2: 1,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sat Dec 28 2024 16:20:00 GMT",
-                    close: "Sat Dec 28 2024 17:30:00 GMT",
+                    start_date: "Sat Dec 28 2024 16:20:00 GMT",
+                    end_date: "Sat Dec 28 2024 17:30:00 GMT",
                 },
             ],
         },
         {
             id: 2,
             name: "Mundial de League of Legends",
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
             type: "League of Legends",
-            open: "Sun Dec 29 2024 13:00:00 GMT",
-            close: "Sun Dec 29 2024 19:00:00 GMT",
+            start_date: "Sun Dec 29 2024 13:00:00 GMT",
+            end_date: "Sun Dec 29 2024 19:00:00 GMT",
             matches: [
                 {
                     id: 1,
@@ -81,8 +84,8 @@ function ReactViteBase(){
                     point2: 3,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 13:00:00 GMT",
-                    close: "Sun Dec 29 2024 14:20:00 GMT",
+                    start_date: "Sun Dec 29 2024 13:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 14:20:00 GMT",
                 },
                 {
                     id: 2,
@@ -92,8 +95,8 @@ function ReactViteBase(){
                     point2: 4,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 14:30:00 GMT",
-                    close: "Sun Dec 29 2024 15:50:00 GMT",
+                    start_date: "Sun Dec 29 2024 14:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 15:50:00 GMT",
                 },
                 {
                     id: 3,
@@ -103,8 +106,8 @@ function ReactViteBase(){
                     point2: 11,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 16:00:00 GMT",
-                    close: "Sun Dec 29 2024 17:20:00 GMT",
+                    start_date: "Sun Dec 29 2024 16:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 17:20:00 GMT",
                 },
                 {
                     id: 4,
@@ -114,17 +117,20 @@ function ReactViteBase(){
                     point2: 4,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 17:30:00 GMT",
-                    close: "Sun Dec 29 2024 18:50:00 GMT",
+                    start_date: "Sun Dec 29 2024 17:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 18:50:00 GMT",
                 },
             ],
         },
         {
             id: 1,
-            name: "Campeonato Tal de Tal",
-            type: "Futebol",
-            open: "Sat Dec 28 2023 15:00:00 GMT",
-            close: "Sat Dec 28 2025 17:40:00 GMT",
+            name: "Campeonato Tal de Basquete",
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
+            type: "Basquete",
+            start_date: "Sat Dec 28 2023 15:00:00 GMT",
+            end_date: "Sat Dec 28 2025 17:40:00 GMT",
             matches: [
                 {
                     id: 1,
@@ -134,8 +140,8 @@ function ReactViteBase(){
                     point2: 1,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sat Dec 28 2023 15:00:00 GMT",
-                    close: "Sat Dec 28 2025 16:10:00 GMT",
+                    start_date: "Sat Dec 28 2023 15:00:00 GMT",
+                    end_date: "Sat Dec 28 2025 16:10:00 GMT",
                 },
                 {
                     id: 2,
@@ -145,17 +151,20 @@ function ReactViteBase(){
                     point2: 1,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sat Dec 28 2024 16:20:00 GMT",
-                    close: "Sat Dec 28 2024 17:30:00 GMT",
+                    start_date: "Sat Dec 28 2024 16:20:00 GMT",
+                    end_date: "Sat Dec 28 2024 17:30:00 GMT",
                 },
             ],
         },
         {
             id: 2,
-            name: "Mundial de League of Legends",
-            type: "League of Legends",
-            open: "Sun Dec 29 2024 13:00:00 GMT",
-            close: "Sun Dec 29 2024 19:00:00 GMT",
+            name: "Mundial de CS GO",
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
+            type: "Counter-Strike: Global Offensive",
+            start_date: "Sun Dec 29 2024 13:00:00 GMT",
+            end_date: "Sun Dec 29 2024 19:00:00 GMT",
             matches: [
                 {
                     id: 1,
@@ -165,8 +174,8 @@ function ReactViteBase(){
                     point2: 3,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 13:00:00 GMT",
-                    close: "Sun Dec 29 2024 14:20:00 GMT",
+                    start_date: "Sun Dec 29 2024 13:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 14:20:00 GMT",
                 },
                 {
                     id: 2,
@@ -176,8 +185,8 @@ function ReactViteBase(){
                     point2: 4,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 14:30:00 GMT",
-                    close: "Sun Dec 29 2024 15:50:00 GMT",
+                    start_date: "Sun Dec 29 2024 14:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 15:50:00 GMT",
                 },
                 {
                     id: 3,
@@ -187,8 +196,8 @@ function ReactViteBase(){
                     point2: 11,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 16:00:00 GMT",
-                    close: "Sun Dec 29 2024 17:20:00 GMT",
+                    start_date: "Sun Dec 29 2024 16:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 17:20:00 GMT",
                 },
                 {
                     id: 4,
@@ -198,8 +207,8 @@ function ReactViteBase(){
                     point2: 4,
                     img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
                     img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
-                    open: "Sun Dec 29 2024 17:30:00 GMT",
-                    close: "Sun Dec 29 2024 18:50:00 GMT",
+                    start_date: "Sun Dec 29 2024 17:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 18:50:00 GMT",
                 },
             ],
         },
@@ -207,36 +216,12 @@ function ReactViteBase(){
     
     return(
         <div className="mt-28 mb-28">
-            <HorizontalSlider title={"Campeonatos Individuais"} championships={championships}
-                              color={SliderColors.light}/>
-
-            <div className="flex flex-row justify-center items-center mt-16 mb-6">
-                <a href="https://vite.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo"/>
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img src={reactLogo} className="logo react" alt="React logo"/>
-                </a>
-            </div>
-
-            <div className="flex flex-row justify-center items-center mb-6">
-                <h1 className="text-4xl">Vite + React</h1>
-            </div>
-
-            <div className="mt-8 flex flex-col justify-center items-center">
-                <button className="w-3/4 lg:w-1/6 btn bg-navbar hover:bg-navbar-secondary-btn-base"
-                        onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                </button>
-                <p className="text-nav-primary-btn mt-8">
-                    Edit <code>src/App.tsx</code> and save to test HRM
-                </p>
-            </div>
-
-            <p className="flex flex-row justify-center items-center read-the-docs mt-4">
-                Click on the Vite and React logos to learn more
-            </p>
-
+            <HorizontalSlider 
+                title={"Campeonatos Individuais"} 
+                championships={championships}
+                color={SliderColors.dark}
+            />
+            
             <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
                 <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
                    lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o

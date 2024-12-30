@@ -31,7 +31,7 @@ const ChampionshipSliderCard: React.FC<Props> = ({index, openDate, closeDate, te
                         {team1}
                     </div>
                     <div
-                        className="text-center text-primary-text lg:text-3xl text-2xl flex flex-col justify-start items-center">{point1}
+                        className="text-center text-primary-text lg:text-3xl text-2xl flex flex-col justify-start items-center mr-2">{point1}
                     </div>
                 </div>
                 <div
@@ -44,7 +44,7 @@ const ChampionshipSliderCard: React.FC<Props> = ({index, openDate, closeDate, te
                         {team2}
                     </div>
                     <div
-                        className="text-center text-primary-text lg:text-3xl text-2xl flex flex-col justify-start items-center">{point2}
+                        className="text-center text-primary-text lg:text-3xl text-2xl flex flex-col justify-start items-center mr-2">{point2}
                     </div>
                 </div>
                 <div

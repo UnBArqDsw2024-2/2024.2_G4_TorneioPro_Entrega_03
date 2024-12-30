@@ -1,5 +1,6 @@
 import React, {useState} from "react";
-import ChampionshipSliderCard from "./ChampionshipSliderCard.tsx";
+// import ChampionshipSliderCard from "./ChampionshipSliderCard.tsx";
+import ChampionshipFutureCard from "./ChampionshipFutureCard.tsx";
 
 export enum SliderColors {
     light,
@@ -7,15 +8,18 @@ export enum SliderColors {
 }
 
 interface Props {
-    // children: React.ReactNode,
     color: SliderColors,
     title: string,
     championships: ({
         id: number;
         name: string;
+        description: string;
+        championship_type: string;
         type: string;
-        open: string;
-        close: string;
+        start_date: string;
+        end_date: string;
+        teams?: any[];
+        players?: any[];
         matches: ({
             id: number;
             team1: string;
@@ -24,8 +28,8 @@ interface Props {
             point2: number;
             img1: string;
             img2: string;
-            open: string;
-            close: string
+            start_date: string;
+            end_date: string;
         })[]
     })[]
 }
@@ -34,30 +38,25 @@ const HorizontalSlider: React.FC<Props> = ({color, title, championships}) => {
     let sliderBackgroundColor = (color == 0) ? "bg-slider-active" : "bg-slider-future";
     let sliderSearchColor = (color == 0) ? "bg-slider-active-search" : "bg-slider-future-search";
 
+    const uniqueSports = Array.from(new Set(championships.map((item: any) => item.type)));
+    
     const [selected, setSelected] = useState("");
-
-    // TODO filtrar os campeonatos de acordo com o SELECT.
-    // const handleSearch = useCallback((e) => {
-    //     const search = e.target.value;
-    //     if(search === '') {
-    //         setFilteredAtividades(atividades);
-    //     } else {
-    //         const filtered = atividades.filter(atividade => {
-    //             return atividade.nome.toLowerCase().includes(search.toLowerCase())
-    //                 || atividade.enunciado.toLowerCase().includes(search.toLowerCase())
-    //                 || formatDateTime(atividade.data_abertura).includes(search)
-    //                 || formatDateTime(atividade.data_encerramento).includes(search);
-    //         });
-    //         setFilteredAtividades(filtered);
-    //     }
-    // });
-
+    const [filteredChampionships, setFilteredChampionships] = useState(championships);
+    
     const handleSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelected(event.target.value);
+
+        const search = (event.target.value).toLowerCase();
+        if(search === "") {
+            setFilteredChampionships(championships);
+        } else {
+            const filtered = championships.filter(championship => {
+                return championship.type.toLowerCase().includes(search.toLowerCase());
+            });
+            setFilteredChampionships(filtered);
+        }
     }
-
-    const uniqueSports = Array.from(new Set(championships.map((item: any) => item.type)));
-
+    
     return (
         <div className="flex flex-col justify-center items-center w-full">
             <div
@@ -77,24 +76,39 @@ const HorizontalSlider: React.FC<Props> = ({color, title, championships}) => {
                 </select>
             </div>
             <ul className="list-none w-[100vw] lg:px-3 lg:pt-3 lg:pb-1 p-1.5 overflow-x-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-x snap-mandatory">
-                {championships.map((championship: any) => {
+                {filteredChampionships.length != 0 ? filteredChampionships.map((championship: any) => {
                     return (
                         championship.matches.map((partida: any) => {
-                            // TODO ver como tirar isso daqui e generalizar.
                             return (
-                                <ChampionshipSliderCard 
+                                // <ChampionshipSliderCard
+                                //     championship={championship.name}
+                                //     index={parseInt(`${championship.id}${partida.id}`)}
+                                //     openDate={partida.start_date} closeDate={partida.end_date}
+                                //     team1={partida.team1} team2={partida.team2}
+                                //     point1={partida.point1} point2={partida.point2}
+                                //     img1={partida.img1} img2={partida.img2}
+                                //     sport={championship.type}
+                                // />
+                                <ChampionshipFutureCard
                                     championship={championship.name}
+                                    id={championship.id}
                                     index={parseInt(`${championship.id}${partida.id}`)}
-                                    openDate={partida.open} closeDate={partida.close}
-                                    team1={partida.team1} team2={partida.team2}
-                                    point1={partida.point1} point2={partida.point2}
-                                    img1={partida.img1} img2={partida.img2}
+                                    closeDate={partida.end_date}
                                     sport={championship.type}
+                                    participants={championship.participants}
+                                    capacity={5}
                                 />
                             )
                         })
                     )
-                })}
+                }) : (
+                    <li key={0}
+                        className="mt-1 flex flex-col justify-center items-center w-[95vw] justify-self-center bg-transparent rounded-[10px] border-2 border-primary-btn-base">
+                        <div className="flex flex-col justify-center lg:h-[30vh] h-[25vh] text-primary-btn-hover lg:text-3xl text-xl">
+                            <p>Nenhum campeonato no momento...</p>
+                        </div>
+                    </li>
+                )}
             </ul>
         </div>
     )
