@@ -14,9 +14,16 @@ class ChampionshipSerializer(serializers.ModelSerializer):
         read_only_fields = ('created_at', 'updated_at')
 
     def create(self, validated_data):
-        # Remove teams data if present, as we'll add teams later
-        validated_data.pop('teams', None)
-        return super().create(validated_data)
+        teams = validated_data.pop('teams', [])
+        championship = super().create(validated_data)
+        if teams:
+            championship.teams.set(teams)
+            # Gera partidas se tiver o número correto de times
+            team_count = championship.teams.count()
+            if (championship.championship_type == 'bracket' and team_count == 16) or \
+               (championship.championship_type == 'points' and 10 <= team_count <= 20):
+                championship.generate_matches()
+        return championship
 
 class ChampionshipJoinRequestSerializer(serializers.ModelSerializer):
     championship_details = ChampionshipSerializer(source='championship', read_only=True)

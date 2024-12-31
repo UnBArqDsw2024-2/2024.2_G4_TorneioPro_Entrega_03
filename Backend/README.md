@@ -181,6 +181,8 @@ Requer Autenticação? Não
 ```
 `Permissões:` None
 
+___
+
 ### Criando um jogador
 
 Para criar um jogador, você precisa fazer uma requisição `POST` para a rota /register/request/ com os seguintes dados:
@@ -230,6 +232,8 @@ Requer Autenticação? Não
 
 *Observação*: Ao logar como organizador, o sistema vai te retornar um token, guarde-o para usar no Postman (ou similares) em relação a sua autenticação.
 
+___
+
 ### Login como treinador
 
 Para se conectar, você precisa fazer uma requisição `POST` para a rota /auth/login/ com os seguintes dados:
@@ -253,6 +257,8 @@ Requer Autenticação? Não
 `Permissões:` None
 
 *Observação*: O treinador só poderá utilizar a aplicação até que o organizador aprove-o.
+
+___
 
 ### Login como jogador
 
@@ -294,6 +300,8 @@ Requer Autenticação? Sim
 
 `Permissões:` Organizador
 
+___
+
 ### Aprovando um treinador pendente
 
 Para aprovar um treinador, você precisa fazer uma requisição `POST` para a rota /auth/trainers/approve/ com os seguintes dados:
@@ -316,7 +324,6 @@ Requer Autenticação? Sim
 
 `Permissões:` Organizador
 
-
 ## Championships
 
 ### Listando campeonatos
@@ -334,6 +341,7 @@ Requer Autenticação? Não
 
 `Permissões:` Todos, incluindo os usuários que ainda não foram autenticados
 
+___
 
 ### Listando campeonatos por ID
 
@@ -350,6 +358,7 @@ Requer Autenticação? Não
 
 `Permissões:` Todos, incluindo os usuários que ainda não foram autenticados
 
+___
 
 ### Criando campeonatos
 
@@ -378,9 +387,18 @@ Requer Autenticação? Sim
 `Permissões:` Organizador
 
 *Observações*: 
-- O campo Teams, o organizador decide se irá colocar os times no momento da criação do campeonato, ou posteriormente pela rota **championships/addteams/**
+- O campo Teams, o organizador decide se irá colocar os times no momento da criação do campeonato, ou posteriormente pela rota **championships/addteams/**. Isso acerreta em duas novas ocasiões:
+
+  - Se adicionou os times no momento da criação, as partidas já serão geradas;
+  - Se não, as partidas só serão geradas quando adicionar os times posteriormente.
+
+- A criação das partidas só é feita quando isso é atentido:
+  - 16 times para bracket 
+  - 10-20 times para points
+
 - O status (is_active) do campeonato é atualizado a cada 5 minutos pela classe **ChampionshipStatusMiddleware** localizada em championships/middleware.py
 
+___
 
 ### Encerrando campeonatos
 
@@ -401,6 +419,8 @@ Requer Autenticação? Sim
 ```
 
 `Permissões:` Organizador
+
+___
 
 
 ### Atualizando campeonato por ID
@@ -423,6 +443,8 @@ Requer Autenticação? Sim
 ```
 
 `Permissões:` Organizador
+
+___
 
 
 ### Solicitando entrada em um campeonato
@@ -454,6 +476,8 @@ Requer Autenticação? Sim
 
 `Permissões:` Jogador
 
+___
+
 
 ### Listando pendências de jogadores em um campeonato
 
@@ -474,6 +498,9 @@ Requer Autenticação? Sim
 ```
 
 `Permissões:` Treinador
+
+
+___
 
 
 ### Rejeitando solicitações de jogadores em um campeonato
@@ -497,6 +524,9 @@ Requer Autenticação? Sim
 `Permissões:` Treinador
 
 
+___
+
+
 ### Aprovando jogador em um time de um campeonato
 
 Para aprovar um jogador em um time, você precisa fazer uma requisição `POST` para a rota /championship/join/approve/ com os seguintes dados:
@@ -516,6 +546,9 @@ Requer Autenticação? Sim
 ```
 
 `Permissões:` Treinador
+
+
+___
 
 
 ### Adicionando times em um campeonato
@@ -540,6 +573,9 @@ Requer Autenticação? Sim
 `Permissões:` Organizador
 
 
+___
+
+
 ### Excluindo times em um campeonato
 
 Para excluir times em um campeonato, você precisa fazer uma requisição `POST` para a rota /championship/remteams/ com os seguintes dados:
@@ -560,6 +596,8 @@ Requer Autenticação? Sim
 ```
 
 `Permissões:` Organizador
+
+___
 
 
 ### Deletando treinador ativo por ID
@@ -583,6 +621,8 @@ Requer Autenticação? Sim
 
 `Permissões`: Organizador
 
+___
+
 
 ## Trainers
 
@@ -600,6 +640,8 @@ Requer Autenticação? Sim
 `Body:` None
 
 `Permissões`: Organizador
+
+___
 
 ### Listando treinador ativo por ID
 
@@ -621,6 +663,8 @@ Requer Autenticação? Sim
 ```
 
 `Permissões`: Organizador
+
+___
 
 
 ### Atualizando treinador ativo por ID
@@ -644,6 +688,8 @@ Requer Autenticação? Sim
 
 `Permissões`: Organizador
 
+___
+
 
 ### Deletando treinador ativo por ID
 
@@ -665,6 +711,8 @@ Requer Autenticação? Sim
 ```
 
 `Permissões`: Organizador
+
+___
 
 ## Players
 
