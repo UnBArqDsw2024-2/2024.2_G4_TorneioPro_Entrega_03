@@ -75,9 +75,9 @@ export default {
             "dashboard-card-title-bg": "#2B3545",
             "dashboard-card-bg": "#313F54",
             "dashboard-card-search": "#3F4D64",
-            "dashboard-card-search-btn": {
+            "dashboard-card-btn": {
                 base: "#3483B0",
-                hover: "#4D9DCA",
+                hover: "#296689",
             },
             
             // ITEM DE LISTA - CAMPEONATO, TIME, JOGADOR, etc
