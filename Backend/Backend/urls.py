@@ -9,5 +9,5 @@ urlpatterns = [
     path('organizers/', include('organizers.urls')),
     path('trainers/', include('trainers.urls')),
     path('players/', include('players.urls')),
-    path('matchs/', include('matches.urls')),
+    path('matches/', include('matches.urls')),
 ]
