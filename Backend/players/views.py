@@ -6,10 +6,11 @@ from django.shortcuts import get_object_or_404
 from authentication.models import User
 from .models import PlayerProfile
 from .serializers import PlayerProfileSerializer
+from authentication.permissions import IsOrganizerOrTrainer
 
 class PlayerViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOrganizerOrTrainer]
 
     def get_queryset(self):
         queryset = PlayerProfile.objects.filter(user__user_type='player')

@@ -8,6 +8,9 @@ from .serializers import UserSerializer, LoginSerializer
 from .models import User
 from .permissions import IsOrganizer
 from django.shortcuts import get_object_or_404
+from trainers.models import TrainerProfile
+from players.models import PlayerProfile
+from datetime import date
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -43,11 +46,26 @@ def register_request(request):
         user = serializer.save()
         if user:
             response_data = serializer.data
-            if user.user_type == 'player':
-                response_data['message'] = 'Player registered successfully'
-            else:
-                response_data['message'] = f'{user.user_type.capitalize()} registration pending approval'
+            if user.user_type == 'trainer':
+                response_data['message'] = 'Trainer registration pending approval'
                 response_data['is_approved'] = user.is_approved
+            else:
+                user.is_approved = True  
+                user.save()
+                
+                # Se for um jogador, criar o perfil do jogador
+                if user.user_type == 'player':
+                    PlayerProfile.objects.get_or_create(
+                        user=user,
+                        defaults={
+                            'nickname': user.username,
+                            'position': 'Not specified',
+                            'birth_date': date(2000, 1, 1)  # Data padrão
+                        }
+                    )
+                
+                response_data['message'] = f'{user.user_type.capitalize()} registered successfully'
+                response_data['is_approved'] = True
             return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -75,6 +93,16 @@ def approve_user(request):
 
     user.is_approved = True
     user.save()
+    
+    # Criar perfil do treinador se ainda não existir
+    TrainerProfile.objects.get_or_create(
+        user=user,
+        defaults={
+            'experience_years': 0,
+            'specialization': 'Not specified',
+            'license_number': f'TMP_{user.id}'  # Número temporário baseado no ID do usuário
+        }
+    )
     
     return Response({
         'message': 'Trainer approved successfully',

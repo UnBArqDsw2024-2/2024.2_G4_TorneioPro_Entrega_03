@@ -19,4 +19,13 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.user == request.user
+
+class IsOrganizerOrTrainer(permissions.BasePermission):
+    """
+    Custom permission to only allow organizers and trainers to access the view.
+    """
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated and (
+            request.user.user_type == 'organizer' or 
+            (request.user.user_type == 'trainer' and request.user.is_approved)
+        )

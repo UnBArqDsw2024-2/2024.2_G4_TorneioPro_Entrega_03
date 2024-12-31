@@ -9,26 +9,23 @@ Sistema para gerenciamento de torneios esportivos, permitindo o cadastro de orga
 
 ## Como executar
 
-1. Clone o repositório
+1. Clone o repositório e entre na pasta do serviço de Backend
 ```bash
-git clone <repository-url>
+git clone git@github.com:UnBArqDsw2024-2/2024.2_G4_TorneioPro_Entrega_03.git 
+
 cd Backend
 ```
 
-2. Configure as variáveis de ambiente (opcional)
-- Crie um arquivo `.env` baseado no `.env.example`
-- Ajuste as variáveis conforme necessário
-
-3. Execute o projeto com Docker
+2. Execute o projeto com Docker
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-4. O servidor estará disponível em `http://localhost:8000`
+3. O servidor estará disponível em `http://localhost:8000`
 
-5. Para parar o servidor
+4. Para parar o servidor
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## Endpoints disponíveis
@@ -138,12 +135,261 @@ A maioria dos endpoints requer autenticação. Para acessá-los, é necessário:
 
 ## Exemplos de Uso
 
-### Login
+## Authentication
+
+### Criando um organizador
+
+Para criar um organizador, você precisa fazer uma requisição `POST` para a rota /register/request/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/register/request/
+
+`Headers:` "Content-Type: application/json"
+
+`Body:` 
+
 ```bash
-curl -X POST http://localhost:8000/auth/login/ \
--H "Content-Type: application/json" \
--d '{"email": "user@example.com", "password": "senha123"}'
+{
+    "username": "seu_username",
+    "email": "seu_email@exemplo.com",
+    "password": "sua_senha",
+    "user_type": "organizer"
+}
 ```
+
+### Criando um treinador
+
+Para criar um treinador, você precisa fazer uma requisição `POST` para a rota /register/request/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/register/request/
+
+`Headers:` "Content-Type: application/json"
+
+`Body:` 
+
+```bash
+{
+    "username": "seu_username",
+    "email": "seu_email@exemplo.com",
+    "password": "sua_senha",
+    "user_type": "trainer"
+}
+```
+
+### Criando um jogador
+
+Para criar um jogador, você precisa fazer uma requisição `POST` para a rota /register/request/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/register/request/
+
+`Headers:` "Content-Type: application/json"
+
+`Body:` 
+
+```bash
+{
+    "username": "seu_username",
+    "email": "seu_email@exemplo.com",
+    "password": "sua_senha",
+    "user_type": "trainer"
+}
+```
+
+___
+
+### Login como organizador
+
+Para se conectar, você precisa fazer uma requisição `POST` para a rota /auth/login/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/login/
+
+`Headers:` "Content-Type: application/json"
+
+`Body:` 
+
+Requer Autenticação? Não
+- "Auth-Type": `No Auth`.
+
+```bash
+{
+    "username": "seu_username",
+    "password": "sua_senha"
+}
+```
+
+*Observação*: Ao logar como organizador, o sistema vai te retornar um token, guarde-o para usar no Postman (ou similares) em relação a sua autenticação.
+
+### Login como treinador
+
+Para se conectar, você precisa fazer uma requisição `POST` para a rota /auth/login/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/login/
+
+`Headers:` "Content-Type: application/json"
+
+`Body:` 
+
+```bash
+{
+    "username": "seu_username",
+    "password": "sua_senha"
+}
+```
+
+*Observação*: O treinador só poderá utilizar a aplicação até que o organizador aprove-o.
+
+### Login como jogador
+
+Para se conectar, você precisa fazer uma requisição `POST` para a rota /auth/login/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/login/
+
+`Headers:` "Content-Type: application/json"
+
+`Body:` 
+
+```bash
+{
+    "username": "seu_username",
+    "password": "sua_senha"
+}
+```
+
+___
+
+
+### Listando treinadores pendentes
+
+Para listar os treinadores pendentes, você precisa fazer uma requisição `GET` para a rota /auth/trainers/pending/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/trainers/pending/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` None
+
+### Aprovando um treinador pendente
+
+Para aprovar um treinador, você precisa fazer uma requisição `POST` para a rota /auth/trainers/approve/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/auth/trainers/approve/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+
+`Body:` 
+
+```bash
+{
+    "trainer_id": "o ID do treinador"
+}
+```
+
+*Observação*: A aprovação só vai funcionar se você estiver autenticado como organizador, lembre-se que isso é definido pelo token que está sendo utilizado.
+
+## Trainers
+
+### Listando treinadores ativos
+
+Para listar os treinadores ativos, você precisa fazer uma requisição `GET` para a rota /trainers/list/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/trainers/list/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` None
+
+### Listando treinador ativo por ID
+
+Para listar um treinador ativo específico, você precisa fazer uma requisição `POST` para a rota /trainers/get/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/trainers/get/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+    "trainer_id": "o ID do treinador"
+}
+```
+
+*Observação*: A listagem por ID só é permitida para os organizadores
+
+
+### Atualizando treinador ativo por ID
+
+Para atualizar um treinador ativo específico, você precisa fazer uma requisição `POST` para a rota /trainers/update/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/trainers/update/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+    "trainer_id": "o ID do treinador"
+}
+```
+
+*Observação*: A atualização por ID só é permitida para os organizadores
+
+
+### Deletando treinador ativo por ID
+
+Para deletar um treinador ativo específico, você precisa fazer uma requisição `POST` para a rota /trainers/delete/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/trainers/delete/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+    "trainer_id": "o ID do treinador"
+}
+```
+
+*Observação*: A deleção por ID só é permitida para os organizadores
+
+## Players
+
+### Listando jogadores
+
+Para listar os jogadores, você precisa fazer uma requisição `GET` para a rota /players/list/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/players/list/
+
+`Headers:` "Content-Type: application/json", "Authorization: Bearer <SEU_TOKEN>"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` None
+
+*Observação*: Apenas os treinadores APROVADOS e organizadores devem ter a possibilidade de listar os jogadores registrados.
+
+
 
 ### Criar um Campeonato
 ```bash
