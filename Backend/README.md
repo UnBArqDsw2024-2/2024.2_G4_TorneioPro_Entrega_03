@@ -115,9 +115,9 @@ docker compose down
 }
 - [Testado] `POST /trainers/get` - Obtém detalhes de um treinador específico
   - Body: { "trainer_id": number }
-- [Não testado] `POST /trainers/update` - Atualiza treinador
+- [Testado] `POST /trainers/update` - Atualiza treinador
   - Body: { "trainer_id": number, ...dados_para_atualizar }
-- [Não testado] `POST /trainers/delete` - Deleta treinador
+- [Testado] `POST /trainers/delete` - Deleta treinador
   - Body: { "trainer_id": number }
 
 ### Jogadores
@@ -644,6 +644,45 @@ Requer Autenticação? Não
 
 ___
 
+### Listando times por ID
+
+Para listar um time específico, você precisa fazer uma requisição `POST` para a rota /teams/get/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/teams/get/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Não 
+- "Auth-Type": **No Auth**
+
+`Body:` None
+
+`Permissões`: Todos, incluindo os usuários que ainda não foram autenticados
+
+___
+
+### Deletando time por ID
+
+Para deletar um time específico, você precisa fazer uma requisição `POST` para a rota /teams/delete/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/teams/delete/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+    "team_id": "o ID do time"
+}
+```
+
+`Permissões`: Organizador
+
+___
 
 ## Trainers
 
@@ -751,3 +790,50 @@ Requer Autenticação? Sim
 `Body:` None
 
 *Observação*: Apenas os treinadores APROVADOS e organizadores devem ter a possibilidade de listar os jogadores registrados.
+
+### Listando jogador por ID
+
+Para listar um jogador ativo específico, você precisa fazer uma requisição `POST` para a rota /players/get/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/players/get/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+    "player_id": "o ID do jogador"
+}
+```
+
+`Permissões`: Apenas os treinadores APROVADOS e organizadores devem ter a possibilidade de listar por ID os jogadores registrados.
+
+___
+
+
+### Deletando jogador por ID
+
+Para deletar um treinador ativo específico, você precisa fazer uma requisição `POST` para a rota /players/delete/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/players/delete/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+    "player_id": "o ID do jogador"
+}
+```
+
+`Permissões`: Apenas os treinadores APROVADOS e organizadores devem ter a possibilidade de deletar os jogadores registrados.
+
+___
