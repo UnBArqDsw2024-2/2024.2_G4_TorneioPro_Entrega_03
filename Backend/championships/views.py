@@ -51,79 +51,48 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
         except Championship.DoesNotExist:
             return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
-    def join_request(self, request):
-        championship_id = request.data.get('championship_id')
-        player_id = request.data.get('player_id')
-        team_id = request.data.get('team_id', None)
+    @action(detail=True, methods=['post'])
+    def join_championship(self, request, pk=None):
+        championship = self.get_object()
+        player = request.user.playerprofile
+        team_id = request.data.get('team_id')
 
-        try:
-            championship = Championship.objects.get(id=championship_id)
-            player = PlayerProfile.objects.get(id=player_id)
+        # Check if player is already in a team for this championship
+        if ChampionshipJoinRequest.objects.filter(
+            championship=championship,
+            player=player,
+            status='approved'
+        ).exists():
+            return Response(
+                {"error": "You are already part of this championship"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-            # Verifica se o campeonato está ativo para inscrições
-            if not championship.is_active:
+        # If it's a team sport, team_id is required and trainer approval is needed
+        if championship.sport_type == 'team':
+            if not team_id:
                 return Response(
-                    {"error": "Championship is not active for registration"},
+                    {"error": "Team ID is required for team sports"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
-            # Verifica se já existe uma solicitação pendente
-            existing_request = ChampionshipJoinRequest.objects.filter(
+            
+            team = Team.objects.get(id=team_id)
+            join_request = ChampionshipJoinRequest.objects.create(
                 championship=championship,
-                player=player
-            ).first()
-
-            if existing_request:
-                return Response(
-                    {"error": f"Player already has a {existing_request.status} request for this championship"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            # Cria a solicitação
-            join_request = ChampionshipJoinRequest(
+                player=player,
+                team=team,
+                status='pending'  # Requires trainer approval
+            )
+        else:
+            # For individual sports, no team or trainer approval needed
+            join_request = ChampionshipJoinRequest.objects.create(
                 championship=championship,
-                player=player
+                player=player,
+                status='approved'  # Auto-approved for individual sports
             )
 
-            if championship.sport_type == 'team':
-                if not team_id:
-                    return Response(
-                        {"error": "Team ID is required for team sports"},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                try:
-                    team = Team.objects.get(id=team_id)
-                    
-                    # Verifica se o time está participando do campeonato
-                    if not championship.teams.filter(id=team.id).exists():
-                        return Response(
-                            {"error": "This team is not participating in the championship"},
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
-                        
-                    join_request.team = team
-                except Team.DoesNotExist:
-                    return Response(
-                        {"error": "Team not found"},
-                        status=status.HTTP_404_NOT_FOUND
-                    )
-
-            join_request.save()  # Isso vai aprovar automaticamente se for esporte individual
-
-            message = "Request sent to team trainer for approval" if championship.sport_type == 'team' else "Player registered successfully"
-            return Response({"message": message}, status=status.HTTP_200_OK)
-
-        except Championship.DoesNotExist:
-            return Response(
-                {"error": "Championship not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except PlayerProfile.DoesNotExist:
-            return Response(
-                {"error": "Player not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        serializer = ChampionshipJoinRequestSerializer(join_request)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
     def approve_join_request(self, request):
@@ -193,6 +162,26 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
             championship = Championship.objects.get(id=championship_id)
             team_ids = request.data.get('team_ids', [])
             teams = Team.objects.filter(id__in=team_ids)
+            
+            # Verifica se cada time tem jogadores suficientes
+            min_players = 11  # Número mínimo de jogadores para um time
+            invalid_teams = []
+            for team in teams:
+                player_count = team.players.count()
+                if player_count < min_players:
+                    invalid_teams.append({
+                        'team_id': team.id,
+                        'name': team.name,
+                        'current_players': player_count,
+                        'required_players': min_players
+                    })
+            
+            if invalid_teams:
+                return Response({
+                    "error": "Some teams don't have enough players",
+                    "invalid_teams": invalid_teams
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             championship.teams.add(*teams)
             
             # Gerar partidas após adicionar os times
@@ -227,3 +216,69 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
             return Response({"message": "Championship closed successfully"})
         except Championship.DoesNotExist:
             return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['post'])
+    def join_request(self, request):
+        championship_id = request.data.get('championship_id')
+        player_id = request.data.get('player_id')
+        team_id = request.data.get('team_id', None)
+
+        try:
+            championship = Championship.objects.get(id=championship_id)
+            player = PlayerProfile.objects.get(id=player_id)
+
+            # Verifica se o campeonato está ativo para inscrições
+            if not championship.is_active:
+                return Response(
+                    {"error": "Championship is not active for registration"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Verifica se já existe uma solicitação pendente
+            existing_request = ChampionshipJoinRequest.objects.filter(
+                championship=championship,
+                player=player
+            ).first()
+
+            if existing_request:
+                return Response(
+                    {"error": f"Player already has a {existing_request.status} request for this championship"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Cria a solicitação
+            join_request = ChampionshipJoinRequest(
+                championship=championship,
+                player=player
+            )
+
+            if championship.sport_type == 'team':
+                if not team_id:
+                    return Response(
+                        {"error": "Team ID is required for team sports"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                try:
+                    team = Team.objects.get(id=team_id)
+                    join_request.team = team
+                except Team.DoesNotExist:
+                    return Response(
+                        {"error": "Team not found"},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+
+            join_request.save()  # Isso vai aprovar automaticamente se for esporte individual
+
+            message = "Request sent to team trainer for approval" if championship.sport_type == 'team' else "Player registered successfully"
+            return Response({"message": message}, status=status.HTTP_200_OK)
+
+        except Championship.DoesNotExist:
+            return Response(
+                {"error": "Championship not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except PlayerProfile.DoesNotExist:
+            return Response(
+                {"error": "Player not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )

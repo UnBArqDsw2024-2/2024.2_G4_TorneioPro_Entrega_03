@@ -20,7 +20,7 @@ class Championship(models.Model):
 
     name = models.CharField(max_length=100)
     description = models.TextField()
-    sport = models.CharField(max_length=50, default='soccer')
+    sport = models.ForeignKey('sports.Sport', on_delete=models.PROTECT, related_name='championships', null=True)
     sport_type = models.CharField(max_length=20, choices=SPORT_TYPES, default='team')
     championship_type = models.CharField(max_length=20, choices=CHAMPIONSHIP_TYPES, default='points')
     start_date = models.DateTimeField()

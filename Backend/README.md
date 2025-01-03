@@ -131,6 +131,17 @@ docker compose down
 - [Testado] `POST /players/delete` - Deleta jogador
   - Body: { "player_id": number }
 
+  ### Esportes
+- [Testado] `GET /sports/list` - Lista todos os esportes
+- [Testado] `POST /sports/get` - Obtém detalhes de um esporte específico
+  - Body: { "sport_id": number }
+- [Testado] `POST /sports/create` - Cria novo esporte
+  - Body: { "name": "Nome do Esporte", "type": "individual" ou "team" }
+- [Não testado] `POST /sports/update` - Atualiza esporte
+  - Body: { "sport_id": number, ...dados_para_atualizar }
+- [Não Testado] `POST /sports/delete` - Deleta esporte
+  - Body: { "sport_id": number }
+
 ## Exemplos de Uso
 
 ## Authentication
@@ -839,5 +850,72 @@ Requer Autenticação? Sim
 ```
 
 `Permissões`: Apenas os treinadores APROVADOS e organizadores devem ter a possibilidade de deletar os jogadores registrados.
+
+___
+
+
+
+## Esportes
+
+### Listando esportes
+
+Para listar os jogadores, você precisa fazer uma requisição `GET` para a rota /sports/list/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/sports/list/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Não
+- "Auth-Type": **No Auth**.
+
+`Body:` None
+
+`Permissões`: None
+
+### Listando esporte por ID
+
+Para listar um esporte específico, você precisa fazer uma requisição `POST` para a rota /sports/get/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/sports/get/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Não 
+- "Auth-Type": **No Auth**.
+
+`Body:` 
+
+```bash
+{
+    "sport_id": "o ID do esporte"
+}
+```
+
+`Permissões`: None
+
+___
+
+
+### Criando esporte
+
+Para criar um esporte, você precisa fazer uma requisição `POST` para a rota /sport/create/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/sport/create/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+
+`Body:` 
+
+```bash
+{
+  "name": "Nome do Esporte",
+  "type": "individual" // ou "team"
+}
+```
+
+`Permissões`: Organizador
 
 ___

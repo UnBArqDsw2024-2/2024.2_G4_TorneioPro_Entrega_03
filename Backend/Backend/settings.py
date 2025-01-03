@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'organizers',
     'matches',
     'Backend',
+    'sports',
 ]
 
 MIDDLEWARE = [
