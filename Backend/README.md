@@ -48,7 +48,7 @@ docker compose down
 ### Campeonatos
 - [Testado] `GET /championships/list` - Lista todos os campeonatos
 - [Testado] `POST /championships/create` - Cria novo campeonato
-  - Body: { "name": "string", "description": "string", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" }
+  - Body: { "name": "string", "description": "string", "sport": number, "sport_type": "team",  // ou "individual", "championship_type": "points" // ou "bracket", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" }
 - [Testado] `POST /championships/get` - Obtém detalhes de um campeonato específico
   - Body: { "championship_id": number }
 - [Testado] `POST /championships/update` - Atualiza campeonato
@@ -390,13 +390,14 @@ Requer Autenticação? Sim
 `Body:`
 ```bash
 {
-  "name": "Championship Name",
-  "description": "Championship Description",
-  "sport": "soccer",  // default is 'soccer'
-  "championship_type": "points",  // can be 'points' or 'bracket'
-  "start_date": "2024-12-31T13:00:00Z",  // datetime in ISO format
-  "end_date": "2025-01-31T13:30:00Z"  // datetime in ISO format
-  "teams": // can be empty or insert the IDs teams
+    "name": "Nome do Campeonato",
+    "description": "Descrição do campeonato",
+    "sport": 1, "ID do esporte"
+    "sport_type": "team",  // ou "individual"
+    "championship_type": "points",  // ou "bracket"
+    "start_date": "2024-01-03T12:00:00Z",
+    "end_date": "2024-02-03T12:00:00Z",
+    "teams": [1, 2, 3] "Lista de IDs dos times (opcional)"
 }
 ```
 
@@ -799,12 +800,16 @@ Para listar os jogadores, você precisa fazer uma requisição `GET` para a rota
 
 `Headers:` "Content-Type: application/json"
 
-Requer Autenticação? Sim 
+Requer Autenticação? Sim
 - "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
 
 `Body:` None
 
+`Permissões`: Organizador e Treinador
+
 *Observação*: Apenas os treinadores APROVADOS e organizadores devem ter a possibilidade de listar os jogadores registrados.
+
+___
 
 ### Listando jogador por ID
 
@@ -871,6 +876,8 @@ Requer Autenticação? Não
 `Body:` None
 
 `Permissões`: None
+
+___
 
 ### Listando esporte por ID
 
