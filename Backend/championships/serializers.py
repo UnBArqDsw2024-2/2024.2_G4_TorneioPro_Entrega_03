@@ -25,6 +25,15 @@ class ChampionshipSerializer(serializers.ModelSerializer):
                 championship.generate_matches()
         return championship
 
+class PendingJoinRequestSerializer(serializers.ModelSerializer):
+    championship_name = serializers.CharField(source='championship.name')
+    player_name = serializers.CharField(source='player.user.username')
+    team_name = serializers.CharField(source='team.name')
+
+    class Meta:
+        model = ChampionshipJoinRequest
+        fields = ('id', 'championship_name', 'player_name', 'team_name', 'status')
+
 class ChampionshipJoinRequestSerializer(serializers.ModelSerializer):
     championship_details = ChampionshipSerializer(source='championship', read_only=True)
     player_details = PlayerProfileSerializer(source='player', read_only=True)

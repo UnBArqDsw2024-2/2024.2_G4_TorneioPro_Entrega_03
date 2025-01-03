@@ -6,6 +6,11 @@ from authentication.models import User
 class TeamSerializer(serializers.ModelSerializer):
     trainer_details = UserSerializer(source='trainer', read_only=True)
     players_details = UserSerializer(source='players', many=True, read_only=True)
+    players = serializers.PrimaryKeyRelatedField(
+        many=True, 
+        queryset=User.objects.all(),
+        required=False  # Torna o campo opcional
+    )
 
     class Meta:
         model = Team
@@ -17,10 +22,4 @@ class TeamSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Trainer must be a user of type 'trainer'")
         if not value.is_approved:
             raise serializers.ValidationError("Trainer must be approved")
-        return value
-
-    def validate_players(self, value):
-        for player in value:
-            if not player.user_type == 'player':
-                raise serializers.ValidationError(f"All players must be users of type 'player'. User {player.username} is of type {player.user_type}")
         return value

@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Championship, ChampionshipJoinRequest
-from .serializers import ChampionshipSerializer, ChampionshipJoinRequestSerializer
+from .serializers import ChampionshipSerializer, ChampionshipJoinRequestSerializer, PendingJoinRequestSerializer
 from teams.models import Team
 from players.models import PlayerProfile
 from django.db.models import Q
@@ -138,6 +138,9 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_403_FORBIDDEN
                 )
 
+            # Adiciona o jogador ao time
+            join_request.team.players.add(join_request.player.user)
+            
             join_request.status = 'approved'
             join_request.save()
             
@@ -180,7 +183,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
             championship__sport_type='team'  # Apenas para esportes em equipe
         ).select_related('championship', 'player', 'team')  # Otimiza as queries
         
-        serializer = ChampionshipJoinRequestSerializer(pending_requests, many=True)
+        serializer = PendingJoinRequestSerializer(pending_requests, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'])
