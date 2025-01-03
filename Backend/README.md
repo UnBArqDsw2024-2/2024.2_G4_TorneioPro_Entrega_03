@@ -59,9 +59,9 @@ docker compose down
     -   Body: { "championship_id":  number, "player_id":  number, "team_id": number }
 - [Testado] `POST /championships/join/approve`  - Treinador aprovar solicitação
 	- Body: { "request_id": number }
-- [Não testado] `POST` /championships/join/reject/ - Treinador rejeitar solicitação
+- [Não testado] `POST /championships/join/reject` - Treinador rejeitar solicitação
 	- Body: { "request_id": number }
-- [Testado] `GET` /championships/join/pending/ - Treinador listar as solicitações
+- [Testado] `GET /championships/join/pending` - Treinador listar as solicitações
 - [Testado] `POST /championships/addteams` - Adiciona times ao campeonato
   - Body: { "championship_id": number, "team_ids": number }
 - [Não testado] `POST /championships/remteams` - Remove times do campeonato
@@ -257,7 +257,9 @@ Requer Autenticação? Não
 
 `Permissões:` None
 
-*Observação*: O treinador só poderá utilizar a aplicação até que o organizador aprove-o.
+*Observações*: 
+- Ao logar como treinador, o sistema vai te retornar um token, guarde-o para usar no Postman (ou similares) em relação a sua autenticação.
+- O treinador só poderá utilizar a aplicação até que o organizador aprove-o.
 
 ___
 
@@ -282,6 +284,8 @@ Requer Autenticação? Não
 ```
 
 `Permissões:` None
+
+*Observação*: Ao logar como jogador, o sistema vai te retornar um token, guarde-o para usar no Postman (ou similares) em relação a sua autenticação.
 
 ___
 
@@ -482,7 +486,7 @@ ___
 
 ### Listando pendências de jogadores em um campeonato
 
-Para listar as pendências, você precisa fazer uma requisição `POST` para a rota /championship/join/approve/ com os seguintes dados:
+Para listar as pendências, você precisa fazer uma requisição `GET` para a rota /championship/join/pending/ com os seguintes dados:
 
 `Rota:` http://localhost:8000/championships/join/pending/
 
