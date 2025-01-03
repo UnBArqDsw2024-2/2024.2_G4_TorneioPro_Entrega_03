@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import {API_BASE_URL} from "../util/Constants.tsx";
+import { API_BASE_URL } from "../util/Constants.tsx";
 import axios from "axios";
 
 interface User {
@@ -14,7 +14,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    login: (username: string, password: string, peba: boolean) => Promise<{ success: boolean; message: string }>;
+    login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -27,41 +27,24 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
-    
+
     useEffect(() => {
         const storedUser = localStorage.getItem("authUser");
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
     }, []);
-    
-    const login = async (username: string, password: string, peba: boolean) => {
-        if(peba){
-            const userData: User = {
-                id: 1,
-                username: "fulano",
-                name: "Fulano",
-                email: "fulano@gmail.com",
-                role: "organizer",
-                approved: true,
-                token: "t0k3n",
-            };
 
-            setUser(userData);
-            localStorage.setItem("authUser", JSON.stringify(userData));
-
-            return { success: true, message: "Login realizado com sucesso!" };
-        }
-        
+    const login = async (username: string, password: string) => {
         const body = {
             username: username,
             password: password,
         };
-        
+
         try {
-            
+
             const response = await axios.post(`${API_BASE_URL}/auth/login/`, body);
-            
+
             const userData: User = {
                 id: response.data.user.id,
                 username,
@@ -71,21 +54,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 approved: response.data.user.is_approved,
                 token: response.data.token,
             };
-            
+
             setUser(userData);
             localStorage.setItem("authUser", JSON.stringify(userData));
-            
+
             return { success: true, message: "Login realizado com sucesso!" };
         } catch (erro) {
             return { success: false, message: "Credenciais inválidas" };
         }
     };
-    
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem("authUser");
     };
-    
+
     const value: AuthContextType = {
         user,
         login,
