@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -7,8 +7,9 @@ from .serializers import ChampionshipSerializer, ChampionshipJoinRequestSerializ
 from teams.models import Team
 from players.models import PlayerProfile
 from django.db.models import Q
+from database.base_view import SingletonDatabaseViewSet
 
-class ChampionshipViewSet(viewsets.ModelViewSet):
+class ChampionshipViewSet(SingletonDatabaseViewSet):
     queryset = Championship.objects.all()
     serializer_class = ChampionshipSerializer
     permission_classes = [IsAuthenticated]
@@ -22,34 +23,138 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
     def get_championship(self, request):
         championship_id = request.data.get('championship_id')
         try:
-            championship = Championship.objects.get(id=championship_id)
-            serializer = self.get_serializer(championship)
-            return Response(serializer.data)
-        except Championship.DoesNotExist:
-            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+            query = """
+                SELECT 
+                    c.id,
+                    c.name,
+                    c.description,
+                    c.start_date,
+                    c.end_date,
+                    c.is_active,
+                    c.championship_type,
+                    c.sport_type,
+                    s.name as sport_name,
+                    COUNT(DISTINCT t.id) as total_teams,
+                    COUNT(DISTINCT m.id) as total_matches
+                FROM 
+                    championships_championship c
+                    LEFT JOIN sports_sport s ON c.sport_id = s.id
+                    LEFT JOIN championships_championship_teams ct ON ct.championship_id = c.id
+                    LEFT JOIN teams_team t ON ct.team_id = t.id
+                    LEFT JOIN matches_match m ON m.championship_id = c.id
+                WHERE 
+                    c.id = %s
+                GROUP BY 
+                    c.id, c.name, c.description, c.start_date, c.end_date,
+                    c.is_active, c.championship_type, c.sport_type, s.name
+            """
+            result = self.execute_aggregation_query(query, (championship_id,))
+            
+            if not result:
+                return Response(
+                    {"error": "Championship not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            championship_data = {
+                'id': result[0],
+                'name': result[1],
+                'description': result[2],
+                'start_date': result[3],
+                'end_date': result[4],
+                'is_active': result[5],
+                'championship_type': result[6],
+                'sport_type': result[7],
+                'sport_name': result[8],
+                'total_teams': result[9],
+                'total_matches': result[10]
+            }
+            
+            return Response(championship_data)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=False, methods=['post'])
     def update_championship(self, request):
         championship_id = request.data.get('championship_id')
         try:
-            championship = Championship.objects.get(id=championship_id)
-            serializer = self.get_serializer(championship, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Championship.DoesNotExist:
-            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+            # Primeiro verifica se o campeonato existe
+            check_query = """
+                SELECT id FROM championships_championship WHERE id = %s
+            """
+            result = self.execute_aggregation_query(check_query, (championship_id,))
+            
+            if not result:
+                return Response(
+                    {"error": "Championship not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Atualiza o campeonato
+            update_query = """
+                UPDATE championships_championship
+                SET 
+                    name = %s,
+                    description = %s,
+                    start_date = %s,
+                    end_date = %s,
+                    is_active = %s,
+                    championship_type = %s,
+                    sport_type = %s
+                WHERE id = %s
+            """
+            self.execute_query(
+                update_query,
+                (
+                    request.data.get('name'),
+                    request.data.get('description'),
+                    request.data.get('start_date'),
+                    request.data.get('end_date'),
+                    request.data.get('is_active'),
+                    request.data.get('championship_type'),
+                    request.data.get('sport_type'),
+                    championship_id
+                )
+            )
+            
+            # Retorna os dados atualizados
+            return self.get_championship(request)
+            
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=False, methods=['post'])
     def delete_championship(self, request):
         championship_id = request.data.get('championship_id')
         try:
-            championship = Championship.objects.get(id=championship_id)
-            championship.delete()
+            # Primeiro deleta as relações
+            self.execute_query(
+                "DELETE FROM championships_championship_teams WHERE championship_id = %s",
+                (championship_id,)
+            )
+            self.execute_query(
+                "DELETE FROM matches_match WHERE championship_id = %s",
+                (championship_id,)
+            )
+            
+            # Depois deleta o campeonato
+            self.execute_query(
+                "DELETE FROM championships_championship WHERE id = %s",
+                (championship_id,)
+            )
+            
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except Championship.DoesNotExist:
-            return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=['post'])
     def join_championship(self, request, pk=None):
