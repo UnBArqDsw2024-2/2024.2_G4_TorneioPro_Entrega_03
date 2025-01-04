@@ -5,14 +5,12 @@ interface FormData {
   name: string;
   sport: string;
   description: string;
-  location: string;
   startDate: string;
   endDate: string;
   category: string;
 }
 
 const SPORTS = ['Futebol', 'Basquete', 'Vôlei', 'Tênis', 'Outros'];
-const LOCATIONS = ['Quadra A', 'Quadra B', 'Campo Principal', 'Ginásio'];
 const CATEGORIES = ['Amador', 'Profissional', 'Juvenil', 'Master'];
 
 const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode; }) => {
@@ -34,7 +32,6 @@ const ChampionshipModal = () => {
     name: '',
     sport: '',
     description: '',
-    location: '',
     startDate: '',
     endDate: '',
     category: '',
@@ -52,7 +49,6 @@ const ChampionshipModal = () => {
       name: '',
       sport: '',
       description: '',
-      location: '',
       startDate: '',
       endDate: '',
       category: '',
@@ -103,15 +99,6 @@ const ChampionshipModal = () => {
             className={`${inputClassName} resize-none`}
           />
           
-          <select 
-            name="location" 
-            value={formData.location} 
-            onChange={handleChange} 
-            className={selectClassName}
-          >
-            <option value="">Local...</option>
-            {LOCATIONS.map(location => <option key={location} value={location}>{location}</option>)}
-          </select>
           
           <div className="grid grid-cols-2 gap-3">
             <input 
