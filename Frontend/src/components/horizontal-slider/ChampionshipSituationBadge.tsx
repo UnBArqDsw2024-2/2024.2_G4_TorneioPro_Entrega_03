@@ -1,6 +1,6 @@
 import React from "react";
-import {IsLive} from "../util/date-util/IsLive.tsx";
-import {DateConverter} from "../util/date-util/DateConverter.tsx";
+import {IsLive} from "../../util/date-util/IsLive.tsx";
+import {DateConverter} from "../../util/date-util/DateConverter.tsx";
 
 interface Props {
     openDate: string;

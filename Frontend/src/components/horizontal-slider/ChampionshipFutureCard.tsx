@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import {DateConverter} from "../util/date-util/DateConverter.tsx";
+import {DateConverter} from "../../util/date-util/DateConverter.tsx";
 
-interface Props {
+interface FutureCardProps {
     index: number;
     championship: string;
     id: number;
@@ -11,7 +11,7 @@ interface Props {
     participants?: any[];
 }
 
-const ChampionshipFutureCard: React.FC<Props> = ({index, closeDate, championship, sport, capacity, participants}) => {
+const ChampionshipFutureCard: React.FC<FutureCardProps> = ({index, closeDate, championship, sport, capacity, participants}) => {
     const closeDateConverted = DateConverter(closeDate, true);
     
     const [occupation, setOccupation] = useState(0);

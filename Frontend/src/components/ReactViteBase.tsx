@@ -1,39 +1,27 @@
-import {useState} from "react";
-import {useAuth} from "../context/AuthContext.tsx";
-import {useNavigate} from "react-router-dom";
-import HorizontalSlider, {SliderColors} from "./HorizontalSlider.tsx";
-import CardComponent from "./DashboardCard.tsx";
-import trophyIcon from "../assets/trophyImage.jpg";
-import PlayerIcon from "../assets/player.png";
-import CoachIcon from "../assets/coach.png";
-import TeamIcon from "../assets/team.png";
-import MatchIcon from "../assets/match.png";
-
-
-function ReactViteBase(){
-    const {login, logout} = useAuth();
+function ReactViteBase() {
+    const { login, logout } = useAuth();
     const navigate = useNavigate();
-    
+
     const [user, setUser] = useState("");
     const [password, setPassword] = useState("");
-    
+
     const [message, setMessage] = useState("");
-    
+
     const handleLogout = () => {
         logout();
         navigate("/login");
     }
     const handleLogin = async () => {
         const response = await login(user, password, false);
-        
-        if(!response.success) setMessage(response.message);
+
+        if (!response.success) setMessage(response.message);
         else navigate("/dashboard");
     }
-    
+
     const handleLoginPeba = async () => {
         const response = await login(user, password, true);
 
-        if(!response.success) setMessage(response.message);
+        if (!response.success) setMessage(response.message);
         else navigate("/dashboard");
     }
 
@@ -41,7 +29,7 @@ function ReactViteBase(){
     const championships = [
         {
             id: 1,
-            name: "Campeonato Tal de Tal", 
+            name: "Campeonato Tal de Tal",
             description: "Bla bla bla",
             championship_type: "sla",
             teams: [],
@@ -220,18 +208,41 @@ function ReactViteBase(){
             ],
         },
     ];
-    
-    return(
-        <div className="mt-28 mb-28">
-            <HorizontalSlider 
-                title={"Campeonatos Individuais"} 
+
+    return (
+        <div className="">
+            <DashboardBody
+                title={"CAMPEONATOS"}
+                items={championships}
+            />
+
+            <Bracket
+            />
+
+            <HorizontalSlider
+                title={"Campeonatos Individuais"}
                 championships={championships}
                 color={SliderColors.dark}
+                strategy={SliderStrategy.future}
             />
-            
+
+            <HorizontalSlider
+                title={"Campeonatos Individuais"}
+                championships={championships}
+                color={SliderColors.light}
+                strategy={SliderStrategy.default}
+            />
+
+            <HorizontalSlider
+                title={"Campeonatos Brackets"}
+                championships={championships}
+                color={SliderColors.light}
+                strategy={SliderStrategy.bracket}
+            />
+
             <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
                 <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
-                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o
+                    lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o
                     Backend.
                 </p>
 
@@ -242,10 +253,10 @@ function ReactViteBase(){
                         fill="currentColor"
                         className="h-4 w-4 opacity-70">
                         <path
-                            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z"/>
+                            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
                     </svg>
                     <input type="text" className="grow" placeholder="Usuário" value={user}
-                           onChange={e => setUser(e.target.value)}/>
+                        onChange={e => setUser(e.target.value)} />
                 </label>
 
                 <label className="input input-bordered flex items-center gap-2">
@@ -257,10 +268,10 @@ function ReactViteBase(){
                         <path
                             fillRule="evenodd"
                             d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-                            clipRule="evenodd"/>
+                            clipRule="evenodd" />
                     </svg>
                     <input type="password" className="grow" placeholder="Senha" value={password}
-                           onChange={e => setPassword(e.target.value)}/>
+                        onChange={e => setPassword(e.target.value)} />
                 </label>
 
                 <button
@@ -280,7 +291,7 @@ function ReactViteBase(){
 
             <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
                 <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
-                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), sem utilizar o
+                    lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), sem utilizar o
                     Backend.
                 </p>
 
