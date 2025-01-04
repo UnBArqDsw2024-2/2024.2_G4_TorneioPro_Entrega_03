@@ -67,8 +67,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('DATABASE_NAME', 'torneio_pro'),
         'USER': os.environ.get('DATABASE_USER', 'root'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'root_password'),
-        'HOST': os.environ.get('DATABASE_HOST', 'db'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'ajlf2468'),
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
         'PORT': '3306',
     }
 }
