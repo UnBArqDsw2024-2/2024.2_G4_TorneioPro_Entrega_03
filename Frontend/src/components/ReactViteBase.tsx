@@ -1,10 +1,3 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext.tsx";
-import { useNavigate } from "react-router-dom";
-import HorizontalSlider, { SliderColors, SliderStrategy } from "./horizontal-slider/HorizontalSlider.tsx";
-import DashboardBody from "./DashboardBody.tsx";
-import Bracket from "./tabela.tsx";
-
 function ReactViteBase() {
     const { login, logout } = useAuth();
     const navigate = useNavigate();
@@ -314,6 +307,14 @@ function ReactViteBase() {
                     Simular Logout
                 </button>
             </div>
+            <div className="flex flex-row gap-x-5"> 
+            <CardComponent qtd={5} title={"Campeonatos"} image={trophyIcon} /> 
+            <CardComponent qtd={4} title={"Jogadores"} image={PlayerIcon} /> 
+            <CardComponent qtd={3} title={"Treinadores"} image={CoachIcon} /> 
+            <CardComponent qtd={2} title={"Partidas"} image={MatchIcon} /> 
+            <CardComponent qtd={1} title={"Times"} image={TeamIcon} /> 
+            </div>  
+            
         </div>
     )
 }
