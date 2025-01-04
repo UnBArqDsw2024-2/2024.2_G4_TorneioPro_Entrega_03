@@ -101,7 +101,7 @@ export default {
             },
             "secondary-btn": {
                 base: "#2C9F4C",
-                hover: "#37C75F",
+                hover: "#21783a",
             },
             "tertiary-btn": {
                 base: "#CD3532",
@@ -110,7 +110,8 @@ export default {
         },
     },
     plugins: [
-      require('daisyui'),
+      require('daisyui'), 
+      require("tailwind-scrollbar"),
     ],
     daisyui: {
         themes: ["dim"],

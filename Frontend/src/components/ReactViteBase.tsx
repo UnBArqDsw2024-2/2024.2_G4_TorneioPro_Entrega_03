@@ -1,11 +1,16 @@
-import viteLogo from "../../public/vite.svg";
-import reactLogo from "../assets/react.svg";
 import {useState} from "react";
 import {useAuth} from "../context/AuthContext.tsx";
-import {useNavigate} from "react-router-dom"; 
+import {useNavigate} from "react-router-dom";
+import HorizontalSlider, {SliderColors} from "./HorizontalSlider.tsx";
+import CardComponent from "./DashboardCard.tsx";
+import trophyIcon from "../assets/trophyImage.jpg";
+import PlayerIcon from "../assets/player.png";
+import CoachIcon from "../assets/coach.png";
+import TeamIcon from "../assets/team.png";
+import MatchIcon from "../assets/match.png";
+
 
 function ReactViteBase(){
-    const [count, setCount] = useState(0)
     const {login, logout} = useAuth();
     const navigate = useNavigate();
     
@@ -19,44 +24,215 @@ function ReactViteBase(){
         navigate("/login");
     }
     const handleLogin = async () => {
-        const response = await login(user, password);
+        const response = await login(user, password, false);
         
         if(!response.success) setMessage(response.message);
         else navigate("/dashboard");
     }
     
+    const handleLoginPeba = async () => {
+        const response = await login(user, password, true);
+
+        if(!response.success) setMessage(response.message);
+        else navigate("/dashboard");
+    }
+
+    // TODO só para testar
+    const championships = [
+        {
+            id: 1,
+            name: "Campeonato Tal de Tal", 
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
+            type: "Futebol",
+            start_date: "Sat Dec 28 2023 15:00:00 GMT",
+            end_date: "Sat Dec 28 2025 17:40:00 GMT",
+            matches: [
+                {
+                    id: 1,
+                    team1: "Time Altano",
+                    team2: "Time Beltrano",
+                    point1: 0,
+                    point2: 1,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sat Dec 28 2023 15:00:00 GMT",
+                    end_date: "Sat Dec 28 2025 16:10:00 GMT",
+                },
+                {
+                    id: 2,
+                    team1: "Time Ciclano",
+                    team2: "Time Deltrano",
+                    point1: 2,
+                    point2: 1,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sat Dec 28 2024 16:20:00 GMT",
+                    end_date: "Sat Dec 28 2024 17:30:00 GMT",
+                },
+            ],
+        },
+        {
+            id: 2,
+            name: "Mundial de League of Legends",
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
+            type: "League of Legends",
+            start_date: "Sun Dec 29 2024 13:00:00 GMT",
+            end_date: "Sun Dec 29 2024 19:00:00 GMT",
+            matches: [
+                {
+                    id: 1,
+                    team1: "Time Tal",
+                    team2: "Time Tel",
+                    point1: 5,
+                    point2: 3,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 13:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 14:20:00 GMT",
+                },
+                {
+                    id: 2,
+                    team1: "Time Til",
+                    team2: "Time Tol",
+                    point1: 8,
+                    point2: 4,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 14:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 15:50:00 GMT",
+                },
+                {
+                    id: 3,
+                    team1: "Time Tul",
+                    team2: "Time Tal Tel",
+                    point1: 6,
+                    point2: 11,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 16:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 17:20:00 GMT",
+                },
+                {
+                    id: 4,
+                    team1: "Time Tal til",
+                    team2: "Time Tal Tol",
+                    point1: 4,
+                    point2: 4,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 17:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 18:50:00 GMT",
+                },
+            ],
+        },
+        {
+            id: 1,
+            name: "Campeonato Tal de Basquete",
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
+            type: "Basquete",
+            start_date: "Sat Dec 28 2023 15:00:00 GMT",
+            end_date: "Sat Dec 28 2025 17:40:00 GMT",
+            matches: [
+                {
+                    id: 1,
+                    team1: "Time Altano",
+                    team2: "Time Beltrano",
+                    point1: 0,
+                    point2: 1,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sat Dec 28 2023 15:00:00 GMT",
+                    end_date: "Sat Dec 28 2025 16:10:00 GMT",
+                },
+                {
+                    id: 2,
+                    team1: "Time Ciclano",
+                    team2: "Time Deltrano",
+                    point1: 2,
+                    point2: 1,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sat Dec 28 2024 16:20:00 GMT",
+                    end_date: "Sat Dec 28 2024 17:30:00 GMT",
+                },
+            ],
+        },
+        {
+            id: 2,
+            name: "Mundial de CS GO",
+            description: "Bla bla bla",
+            championship_type: "sla",
+            teams: [],
+            type: "Counter-Strike: Global Offensive",
+            start_date: "Sun Dec 29 2024 13:00:00 GMT",
+            end_date: "Sun Dec 29 2024 19:00:00 GMT",
+            matches: [
+                {
+                    id: 1,
+                    team1: "Time Tal",
+                    team2: "Time Tel",
+                    point1: 5,
+                    point2: 3,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 13:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 14:20:00 GMT",
+                },
+                {
+                    id: 2,
+                    team1: "Time Til",
+                    team2: "Time Tol",
+                    point1: 8,
+                    point2: 4,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 14:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 15:50:00 GMT",
+                },
+                {
+                    id: 3,
+                    team1: "Time Tul",
+                    team2: "Time Tal Tel",
+                    point1: 6,
+                    point2: 11,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 16:00:00 GMT",
+                    end_date: "Sun Dec 29 2024 17:20:00 GMT",
+                },
+                {
+                    id: 4,
+                    team1: "Time Tal til",
+                    team2: "Time Tal Tol",
+                    point1: 4,
+                    point2: 4,
+                    img1: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    img2: "https://cdn-icons-png.flaticon.com/512/4793/4793141.png",
+                    start_date: "Sun Dec 29 2024 17:30:00 GMT",
+                    end_date: "Sun Dec 29 2024 18:50:00 GMT",
+                },
+            ],
+        },
+    ];
+    
     return(
         <div className="mt-28 mb-28">
-            <div className="flex flex-row justify-center items-center mb-6">
-                <a href="https://vite.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo"/>
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img src={reactLogo} className="logo react" alt="React logo"/>
-                </a>
-            </div>
-
-            <div className="flex flex-row justify-center items-center mb-6">
-                <h1 className="text-4xl">Vite + React</h1>
-            </div>
-
-            <div className="mt-8 flex flex-col justify-center items-center">
-                <button className="w-3/4 lg:w-1/6 btn bg-navbar hover:bg-navbar-secondary-btn-base"
-                        onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                </button>
-                <p className="text-nav-primary-btn mt-8">
-                    Edit <code>src/App.tsx</code> and save to test HRM
-                </p>
-            </div>
-
-            <p className="flex flex-row justify-center items-center read-the-docs mt-4">
-                Click on the Vite and React logos to learn more
-            </p>
-
+            <HorizontalSlider 
+                title={"Campeonatos Individuais"} 
+                championships={championships}
+                color={SliderColors.dark}
+            />
+            
             <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
                 <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
-                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o Backend.
+                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o
+                    Backend.
                 </p>
 
                 <label className="input input-bordered flex items-center gap-2">
@@ -90,7 +266,7 @@ function ReactViteBase(){
                 <button
                     onClick={() => handleLogin()}
                     className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
-                    Simular Login
+                    Login
                 </button>
 
                 <p className="text-lg text-secondary">{message}</p>
@@ -98,10 +274,35 @@ function ReactViteBase(){
                 <button
                     onClick={() => handleLogout()}
                     className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
+                    Logout
+                </button>
+            </div>
+
+            <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
+                <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
+                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), sem utilizar o
+                    Backend.
+                </p>
+
+                <button
+                    onClick={() => handleLoginPeba()}
+                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
+                    Simular Login
+                </button>
+
+                <button
+                    onClick={() => handleLogout()}
+                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
                     Simular Logout
                 </button>
             </div>
-            
+            <div className="flex flex-row gap-x-5"> 
+            <CardComponent qtd={5} title={"Campeonatos"} image={trophyIcon} /> 
+            <CardComponent qtd={4} title={"Jogadores"} image={PlayerIcon} /> 
+            <CardComponent qtd={3} title={"Treinadores"} image={CoachIcon} /> 
+            <CardComponent qtd={2} title={"Partidas"} image={MatchIcon} /> 
+            <CardComponent qtd={1} title={"Times"} image={TeamIcon} /> 
+            </div>  
             
         </div>
     )
