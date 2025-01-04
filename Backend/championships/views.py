@@ -1,12 +1,13 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from authentication.permissions import IsOrganizer
 from .models import Championship, ChampionshipJoinRequest
 from .serializers import ChampionshipSerializer, ChampionshipJoinRequestSerializer, PendingJoinRequestSerializer
 from teams.models import Team
 from players.models import PlayerProfile
-from django.db.models import Q
 from database.base_view import SingletonDatabaseViewSet
 
 class ChampionshipViewSet(SingletonDatabaseViewSet):
@@ -19,9 +20,9 @@ class ChampionshipViewSet(SingletonDatabaseViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    @action(detail=False, methods=['post'])
-    def get_championship(self, request):
-        championship_id = request.data.get('championship_id')
+    @action(detail=False, methods=['get'])
+    def list_championships(self, request):
+        """Lista todos os campeonatos com estatísticas básicas"""
         try:
             query = """
                 SELECT 
@@ -34,13 +35,95 @@ class ChampionshipViewSet(SingletonDatabaseViewSet):
                     c.championship_type,
                     c.sport_type,
                     s.name as sport_name,
-                    COUNT(DISTINCT t.id) as total_teams,
+                    COUNT(DISTINCT ct.team_id) as total_teams,
                     COUNT(DISTINCT m.id) as total_matches
                 FROM 
                     championships_championship c
                     LEFT JOIN sports_sport s ON c.sport_id = s.id
                     LEFT JOIN championships_championship_teams ct ON ct.championship_id = c.id
-                    LEFT JOIN teams_team t ON ct.team_id = t.id
+                    LEFT JOIN matches_match m ON m.championship_id = c.id
+                GROUP BY 
+                    c.id, c.name, c.description, c.start_date, c.end_date,
+                    c.is_active, c.championship_type, c.sport_type, s.name
+                ORDER BY 
+                    c.start_date DESC
+            """
+            championships = self.get_db_facade().fetch_all(query)
+            return Response(championships)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['post'])
+    def create_championship(self, request):
+        """Cria um novo campeonato"""
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                # Inserir o campeonato
+                championship_id = self.get_db_facade().insert(
+                    'championships_championship',
+                    {
+                        'name': request.data['name'],
+                        'description': request.data['description'],
+                        'sport_id': request.data['sport_id'],
+                        'start_date': request.data['start_date'],
+                        'end_date': request.data['end_date'],
+                        'is_active': request.data.get('is_active', False),
+                        'championship_type': request.data.get('championship_type', 'points'),
+                        'sport_type': request.data.get('sport_type', 'team')
+                    }
+                )
+                
+                # Se houver times, adicionar ao campeonato
+                if 'teams' in request.data:
+                    for team_id in request.data['teams']:
+                        self.get_db_facade().insert(
+                            'championships_championship_teams',
+                            {
+                                'championship_id': championship_id,
+                                'team_id': team_id
+                            }
+                        )
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    {"error": str(e)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def get_championship(self, request):
+        """Obtém detalhes de um campeonato específico"""
+        championship_id = request.data.get('championship_id')
+        if not championship_id:
+            return Response(
+                {"error": "championship_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            query = """
+                SELECT 
+                    c.id,
+                    c.name,
+                    c.description,
+                    c.start_date,
+                    c.end_date,
+                    c.is_active,
+                    c.championship_type,
+                    c.sport_type,
+                    s.name as sport_name,
+                    COUNT(DISTINCT ct.team_id) as total_teams,
+                    COUNT(DISTINCT m.id) as total_matches
+                FROM 
+                    championships_championship c
+                    LEFT JOIN sports_sport s ON c.sport_id = s.id
+                    LEFT JOIN championships_championship_teams ct ON ct.championship_id = c.id
                     LEFT JOIN matches_match m ON m.championship_id = c.id
                 WHERE 
                     c.id = %s
@@ -48,7 +131,7 @@ class ChampionshipViewSet(SingletonDatabaseViewSet):
                     c.id, c.name, c.description, c.start_date, c.end_date,
                     c.is_active, c.championship_type, c.sport_type, s.name
             """
-            result = self.execute_aggregation_query(query, (championship_id,))
+            result = self.get_db_facade().fetch_one(query, (championship_id,))
             
             if not result:
                 return Response(
@@ -57,18 +140,32 @@ class ChampionshipViewSet(SingletonDatabaseViewSet):
                 )
             
             championship_data = {
-                'id': result[0],
-                'name': result[1],
-                'description': result[2],
-                'start_date': result[3],
-                'end_date': result[4],
-                'is_active': result[5],
-                'championship_type': result[6],
-                'sport_type': result[7],
-                'sport_name': result[8],
-                'total_teams': result[9],
-                'total_matches': result[10]
+                'id': result['id'],
+                'name': result['name'],
+                'description': result['description'],
+                'start_date': result['start_date'],
+                'end_date': result['end_date'],
+                'is_active': result['is_active'],
+                'championship_type': result['championship_type'],
+                'sport_type': result['sport_type'],
+                'sport_name': result['sport_name'],
+                'total_teams': result['total_teams'],
+                'total_matches': result['total_matches']
             }
+            
+            # Buscar times do campeonato
+            teams_query = """
+                SELECT 
+                    t.id,
+                    t.name
+                FROM 
+                    teams_team t
+                    INNER JOIN championships_championship_teams ct ON ct.team_id = t.id
+                WHERE 
+                    ct.championship_id = %s
+            """
+            teams = self.get_db_facade().fetch_all(teams_query, (championship_id,))
+            championship_data['teams'] = teams
             
             return Response(championship_data)
         except Exception as e:
@@ -79,50 +176,57 @@ class ChampionshipViewSet(SingletonDatabaseViewSet):
 
     @action(detail=False, methods=['post'])
     def update_championship(self, request):
+        """Atualiza um campeonato existente"""
         championship_id = request.data.get('championship_id')
+        if not championship_id:
+            return Response(
+                {"error": "championship_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         try:
-            # Primeiro verifica se o campeonato existe
-            check_query = """
-                SELECT id FROM championships_championship WHERE id = %s
-            """
-            result = self.execute_aggregation_query(check_query, (championship_id,))
+            # Atualizar o campeonato
+            rows_updated = self.get_db_facade().update(
+                'championships_championship',
+                {
+                    'name': request.data['name'],
+                    'description': request.data['description'],
+                    'sport_id': request.data['sport_id'],
+                    'start_date': request.data['start_date'],
+                    'end_date': request.data['end_date'],
+                    'is_active': request.data.get('is_active', False),
+                    'championship_type': request.data.get('championship_type', 'points'),
+                    'sport_type': request.data.get('sport_type', 'team')
+                },
+                {'id': championship_id}
+            )
             
-            if not result:
+            if rows_updated == 0:
                 return Response(
                     {"error": "Championship not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Atualiza o campeonato
-            update_query = """
-                UPDATE championships_championship
-                SET 
-                    name = %s,
-                    description = %s,
-                    start_date = %s,
-                    end_date = %s,
-                    is_active = %s,
-                    championship_type = %s,
-                    sport_type = %s
-                WHERE id = %s
-            """
-            self.execute_query(
-                update_query,
-                (
-                    request.data.get('name'),
-                    request.data.get('description'),
-                    request.data.get('start_date'),
-                    request.data.get('end_date'),
-                    request.data.get('is_active'),
-                    request.data.get('championship_type'),
-                    request.data.get('sport_type'),
-                    championship_id
+            # Atualizar times se fornecidos
+            if 'teams' in request.data:
+                # Remover times antigos
+                self.get_db_facade().delete(
+                    'championships_championship_teams',
+                    {'championship_id': championship_id}
                 )
-            )
+                
+                # Adicionar novos times
+                for team_id in request.data['teams']:
+                    self.get_db_facade().insert(
+                        'championships_championship_teams',
+                        {
+                            'championship_id': championship_id,
+                            'team_id': team_id
+                        }
+                    )
             
-            # Retorna os dados atualizados
+            # Retornar dados atualizados
             return self.get_championship(request)
-            
         except Exception as e:
             return Response(
                 {"error": str(e)},
@@ -131,23 +235,44 @@ class ChampionshipViewSet(SingletonDatabaseViewSet):
 
     @action(detail=False, methods=['post'])
     def delete_championship(self, request):
+        """Deleta um campeonato"""
         championship_id = request.data.get('championship_id')
-        try:
-            # Primeiro deleta as relações
-            self.execute_query(
-                "DELETE FROM championships_championship_teams WHERE championship_id = %s",
-                (championship_id,)
-            )
-            self.execute_query(
-                "DELETE FROM matches_match WHERE championship_id = %s",
-                (championship_id,)
+        if not championship_id:
+            return Response(
+                {"error": "championship_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
             )
             
-            # Depois deleta o campeonato
-            self.execute_query(
-                "DELETE FROM championships_championship WHERE id = %s",
-                (championship_id,)
+        try:
+            # Verificar se existem partidas
+            matches_count = self.get_db_facade().count(
+                'matches_match',
+                {'championship_id': championship_id}
             )
+            
+            if matches_count > 0:
+                return Response(
+                    {"error": "Cannot delete championship that has matches"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Remover times do campeonato
+            self.get_db_facade().delete(
+                'championships_championship_teams',
+                {'championship_id': championship_id}
+            )
+            
+            # Deletar o campeonato
+            rows_deleted = self.get_db_facade().delete(
+                'championships_championship',
+                {'id': championship_id}
+            )
+            
+            if rows_deleted == 0:
+                return Response(
+                    {"error": "Championship not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:

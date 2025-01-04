@@ -33,15 +33,7 @@ class SportViewSet(SingletonDatabaseViewSet):
                 GROUP BY 
                     s.id, s.name, s.type
             """
-            results = self.execute_query(query)
-            
-            sports_list = [{
-                'id': row[0],
-                'name': row[1],
-                'type': row[2],
-                'championship_count': row[3]
-            } for row in results]
-            
+            sports_list = self.get_db_facade().fetch_all(query)
             return Response(sports_list)
         except Exception as e:
             return Response(
@@ -50,8 +42,27 @@ class SportViewSet(SingletonDatabaseViewSet):
             )
 
     @action(detail=False, methods=['post'])
+    def create_sport(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                sport_id = self.get_db_facade().insert(
+                    'sports_sport',
+                    {
+                        'name': request.data['name'],
+                        'type': request.data['type']
+                    }
+                )
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    {"error": str(e)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
     def get_sport(self, request):
-        """Obtém detalhes de um esporte específico"""
         sport_id = request.data.get('sport_id')
         if not sport_id:
             return Response(
@@ -76,21 +87,13 @@ class SportViewSet(SingletonDatabaseViewSet):
                 GROUP BY 
                     s.id, s.name, s.type
             """
-            result = self.execute_aggregation_query(query, (sport_id,))
+            sport_data = self.get_db_facade().fetch_one(query, (sport_id,))
             
-            if not result:
+            if not sport_data:
                 return Response(
                     {"error": "Sport not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            
-            sport_data = {
-                'id': result[0],
-                'name': result[1],
-                'type': result[2],
-                'total_championships': result[3],
-                'total_teams': result[4]
-            }
             
             return Response(sport_data)
         except Exception as e:
@@ -98,28 +101,6 @@ class SportViewSet(SingletonDatabaseViewSet):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-    @action(detail=False, methods=['post'])
-    def create_sport(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                # Usando uma transação direta para criar o esporte
-                query = """
-                    INSERT INTO sports_sport (name, type)
-                    VALUES (%s, %s)
-                """
-                self.execute_query(
-                    query,
-                    (request.data['name'], request.data['type'])
-                )
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response(
-                    {"error": str(e)},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['put'])
     def update_sport(self, request):
@@ -130,27 +111,29 @@ class SportViewSet(SingletonDatabaseViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        sport = get_object_or_404(Sport, id=sport_id)
-        serializer = self.get_serializer(sport, data=request.data, partial=True)
-        
-        if serializer.is_valid():
-            try:
-                query = """
-                    UPDATE sports_sport
-                    SET name = %s, type = %s
-                    WHERE id = %s
-                """
-                self.execute_query(
-                    query,
-                    (request.data['name'], request.data['type'], sport_id)
-                )
-                return Response(serializer.data)
-            except Exception as e:
+        try:
+            rows_updated = self.get_db_facade().update(
+                'sports_sport',
+                {
+                    'name': request.data['name'],
+                    'type': request.data['type']
+                },
+                {'id': sport_id}
+            )
+            
+            if rows_updated == 0:
                 return Response(
-                    {"error": str(e)},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    {"error": "Sport not found"},
+                    status=status.HTTP_404_NOT_FOUND
                 )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Retorna os dados atualizados
+            return self.get_sport(request)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=False, methods=['delete'])
     def delete_sport(self, request):
@@ -163,22 +146,28 @@ class SportViewSet(SingletonDatabaseViewSet):
             
         try:
             # Verificar se o esporte está sendo usado
-            check_query = """
-                SELECT COUNT(*) 
-                FROM championships_championship 
-                WHERE sport_id = %s
-            """
-            result = self.execute_aggregation_query(check_query, (sport_id,))
+            championships_count = self.get_db_facade().count(
+                'championships_championship',
+                {'sport_id': sport_id}
+            )
             
-            if result and result[0] > 0:
+            if championships_count > 0:
                 return Response(
                     {"error": "Cannot delete sport that is being used in championships"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
             # Deletar o esporte
-            delete_query = "DELETE FROM sports_sport WHERE id = %s"
-            self.execute_query(delete_query, (sport_id,))
+            rows_deleted = self.get_db_facade().delete(
+                'sports_sport',
+                {'id': sport_id}
+            )
+            
+            if rows_deleted == 0:
+                return Response(
+                    {"error": "Sport not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
