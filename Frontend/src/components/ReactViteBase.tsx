@@ -1,3 +1,9 @@
+import {useAuth} from "../context/AuthContext.tsx";
+import {useNavigate} from "react-router-dom";
+import {useState} from "react";
+import DashboardBody from "./DashboardBody.tsx";
+import HorizontalSlider, {SliderColors, SliderStrategy} from "./horizontal-slider/HorizontalSlider.tsx";
+
 function ReactViteBase() {
     const { login, logout } = useAuth();
     const navigate = useNavigate();
@@ -12,14 +18,14 @@ function ReactViteBase() {
         navigate("/login");
     }
     const handleLogin = async () => {
-        const response = await login(user, password, false);
+        const response = await login(user, password);
 
         if (!response.success) setMessage(response.message);
         else navigate("/dashboard");
     }
 
     const handleLoginPeba = async () => {
-        const response = await login(user, password, true);
+        const response = await login(user, password);
 
         if (!response.success) setMessage(response.message);
         else navigate("/dashboard");
@@ -216,9 +222,6 @@ function ReactViteBase() {
                 items={championships}
             />
 
-            <Bracket
-            />
-
             <HorizontalSlider
                 title={"Campeonatos Individuais"}
                 championships={championships}
@@ -307,14 +310,6 @@ function ReactViteBase() {
                     Simular Logout
                 </button>
             </div>
-            <div className="flex flex-row gap-x-5"> 
-            <CardComponent qtd={5} title={"Campeonatos"} image={trophyIcon} /> 
-            <CardComponent qtd={4} title={"Jogadores"} image={PlayerIcon} /> 
-            <CardComponent qtd={3} title={"Treinadores"} image={CoachIcon} /> 
-            <CardComponent qtd={2} title={"Partidas"} image={MatchIcon} /> 
-            <CardComponent qtd={1} title={"Times"} image={TeamIcon} /> 
-            </div>  
-            
         </div>
     )
 }

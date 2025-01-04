@@ -11,7 +11,7 @@ export class TailwindThemeAdapter {
             secondary: "text-secondary-text",
             detail: "text-primary-text-detail",
             accent: "text-accent-text",
-            placeholder: "placeholder-formPlaceholderText",
+            placeholder: "bg-formPlaceholderText",
         },
 
         navbar: {
@@ -72,7 +72,7 @@ export class TailwindThemeAdapter {
             search: "bg-dashboard-card-search",
             btn: {
                 base: "bg-dashboard-card-btn-base",
-                hover: "hover:bg-dashboard-card-btn-hover",
+                hover: "bg-dashboard-card-btn-hover",
             },
         },
 
