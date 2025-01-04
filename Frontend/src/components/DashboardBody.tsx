@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { TailwindThemeAdapter } from "./adpater/adapter";
+import { TailwindThemeAdapter } from "./adpater/TailwindThemeAdapter.tsx";
 
 interface Props {
     title: string;
@@ -42,14 +42,14 @@ const DashboardBody: React.FC<Props> = ({ title, items }) => {
     return (
         <div className={`${colors.dashboardCard.bg} shadow-lg rounded-[10px] lg:mt-20 lg:mx-3.5 mx-2.5`}>
             <div className={`${colors.dashboardCard.titleBg} rounded-t-[10px]`}>
-                <div className="flex flex-col justify-between items-center lg:flex-row lg:px-4 px-2">
+                <div className="flex flex-col justify-center items-center lg:flex-row lg:px-4 px-2">
                     <p className={`lg:my-2.5 my-1.5 lg:text-4xl text-xl ${colors.text.detail}`}>{title}</p>
-                    <button
-                        onClick={toggleTheme}
-                        className={`${colors.buttons.primary.base} hover:${colors.buttons.primary.hover} lg:h-[40px] h-[30px] lg:px-4 px-2 text-sm rounded`}
-                    >
-                        Alternar para {theme === "dark" ? "Modo Claro" : "Modo Escuro"}
-                    </button>
+                    {/*<button*/}
+                    {/*    onClick={toggleTheme}*/}
+                    {/*    className={`${colors.buttons.primary.base} hover:${colors.buttons.primary.hover} lg:h-[40px] h-[30px] lg:px-4 px-2 text-sm rounded`}*/}
+                    {/*>*/}
+                    {/*    Alternar para {theme === "dark" ? "Modo Claro" : "Modo Escuro"}*/}
+                    {/*</button>*/}
                 </div>
             </div>
             <div className="flex flex-col h-[82vh]">

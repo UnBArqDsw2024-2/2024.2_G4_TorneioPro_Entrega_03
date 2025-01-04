@@ -1,5 +1,3 @@
-// adapters/TailwindThemeAdapter.ts
-
 export class TailwindThemeAdapter {
     private static darkMode = {
         transparent: "transparent",

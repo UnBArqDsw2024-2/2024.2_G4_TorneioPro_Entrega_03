@@ -1,6 +1,5 @@
-// providers/ThemeProvider.tsx
 import React, { createContext, useContext, useState } from "react";
-import { TailwindThemeAdapter } from "../components/adpater/adapter.tsx";
+import { TailwindThemeAdapter } from "../components/adpater/TailwindThemeAdapter.tsx";
 
 interface ThemeContextType {
     theme: "light" | "dark";
