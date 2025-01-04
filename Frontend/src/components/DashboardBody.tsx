@@ -81,7 +81,7 @@ const DashboardBody: React.FC<Props> = ({ title, items }) => {
                     </div>
                     <div className="flex flex-row lg:mt-0 mt-4 lg:gap-x-6 gap-x-2">
                         <button
-                            className={`${colors.dashboardCard.btn.base} hover:${colors.dashboardCard.btn.hover} lg:h-[50px] h-[40px] lg:w-[15vw] w-[40vw] rounded-[10px] flex flex-row justify-start items-center pl-3 mr-1 lg:text-lg text-sm`}
+                            className={`${colors.dashboardCard.btn.base} ${colors.dashboardCard.btn.hover} lg:h-[50px] h-[40px] lg:w-[15vw] w-[40vw] rounded-[10px] flex flex-row justify-start items-center pl-3 mr-1 lg:text-lg text-sm`}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -102,31 +102,22 @@ const DashboardBody: React.FC<Props> = ({ title, items }) => {
                     </div>
                 </div>
                 <div className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
-                    {filteredItems.length !== 0 ? (
-                        filteredItems.map((item, i) => (
-                            <div
-                                key={i}
-                                className={`h-[88px] w-full ${colors.buttons.secondary.base} rounded my-4 snap-center`}
-                            >
-                                {item.name}
-                            </div>
-                        ))
-                    ) : (
-                        <div
-                            key={0}
-                            className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}
-                        >
-                            <div
-                                className={`flex flex-col justify-center lg:h-[15vh] h-[15vh] ${colors.buttons.primary.hover} lg:text-3xl text-xl`}
-                            >
-                                <p>Sem {title.toLowerCase()} no momento...</p>
-                            </div>
-                        </div>
-                    )}
+                {filteredItems.length !== 0 ? (
+                    filteredItems.map((item) => (
+                        // TODO aqui vai o ChampionshipListItem ou TeamListItem ou PlayerListItem, etc...
+                    ))
+                ) : (
+                <div key={0} className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}>
+                    <div className={`flex flex-col justify-center lg:h-[15vh] h-[15vh] ${colors.buttons.primary.hover} lg:text-3xl text-xl`}>
+                        <p>Sem {title.toLowerCase()} no momento...</p>
+                    </div>
                 </div>
+                )}
             </div>
         </div>
-    );
+</div>
+)
+    ;
 };
 
 export default DashboardBody;
