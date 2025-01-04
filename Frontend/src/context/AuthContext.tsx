@@ -14,7 +14,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
+    login: (username: string, password: string, peba: boolean) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -35,7 +35,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }, []);
     
-    const login = async (username: string, password: string) => {
+    const login = async (username: string, password: string, peba: boolean) => {
+        if(peba){
+            const userData: User = {
+                id: 1,
+                username: "fulano",
+                name: "Fulano",
+                email: "fulano@gmail.com",
+                role: "organizer",
+                approved: true,
+                token: "t0k3n",
+            };
+
+            setUser(userData);
+            localStorage.setItem("authUser", JSON.stringify(userData));
+
+            return { success: true, message: "Login realizado com sucesso!" };
+        }
+        
         const body = {
             username: username,
             password: password,
