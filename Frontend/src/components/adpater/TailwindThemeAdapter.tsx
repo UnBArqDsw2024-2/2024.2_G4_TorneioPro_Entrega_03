@@ -11,19 +11,19 @@ export class TailwindThemeAdapter {
             secondary: "text-secondary-text",
             detail: "text-primary-text-detail",
             accent: "text-accent-text",
-            placeholder: "bg-formPlaceholderText",
+            placeholder: "text-formPlaceholderText",
         },
 
         navbar: {
             base: "bg-navbar",
-            hover: "hover:bg-navbar-hover",
+            hover: "bg-navbar-hover",
             primaryBtn: {
                 base: "bg-navbar-primary-btn-base",
-                hover: "hover:bg-navbar-primary-btn-hover",
+                hover: "bg-navbar-primary-btn-hover",
             },
             secondaryBtn: {
                 base: "bg-navbar-secondary-btn-base",
-                hover: "hover:bg-navbar-secondary-btn-hover",
+                hover: "bg-navbar-secondary-btn-hover",
             },
         },
 
@@ -46,7 +46,7 @@ export class TailwindThemeAdapter {
             entryOccupation: "bg-modal-entry-occupation",
             entryViewBtn: {
                 base: "bg-modal-entry-view-btn-base",
-                hover: "hover:bg-modal-entry-view-btn-hover",
+                hover: "bg-modal-entry-view-btn-hover",
             },
             entryBg: "bg-modal-entry-bg",
             entryInput: "bg-modal-entry-input",
@@ -58,11 +58,11 @@ export class TailwindThemeAdapter {
             bg: "bg-sidebar-bg",
             baseBtn: {
                 base: "bg-sidebar-base-btn-base",
-                hover: "hover:bg-sidebar-base-btn-hover",
+                hover: "bg-sidebar-base-btn-hover",
             },
             activeBtn: {
                 base: "bg-sidebar-active-btn-base",
-                hover: "hover:bg-sidebar-active-btn-hover",
+                hover: "bg-sidebar-active-btn-hover",
             },
         },
 
@@ -72,7 +72,7 @@ export class TailwindThemeAdapter {
             search: "bg-dashboard-card-search",
             btn: {
                 base: "bg-dashboard-card-btn-base",
-                hover: "bg-dashboard-card-btn-hover",
+                hover: "hover:bg-dashboard-card-btn-hover",
             },
         },
 
@@ -80,7 +80,7 @@ export class TailwindThemeAdapter {
             bg: "bg-list-item-bg",
             btn: {
                 base: "bg-list-item-btn-base",
-                hover: "hover:bg-list-item-btn-hover",
+                hover: "bg-list-item-btn-hover",
             },
             occupation: "bg-list-item-occupation",
             avatarBg: "bg-list-item-avatar-bg",
@@ -95,15 +95,15 @@ export class TailwindThemeAdapter {
         buttons: {
             primary: {
                 base: "bg-primary-btn-base",
-                hover: "hover:bg-primary-btn-hover",
+                hover: "bg-primary-btn-hover",
             },
             secondary: {
                 base: "bg-secondary-btn-base",
-                hover: "hover:bg-secondary-btn-hover",
+                hover: "bg-secondary-btn-hover",
             },
             tertiary: {
                 base: "bg-tertiary-btn-base",
-                hover: "hover:bg-tertiary-btn-hover",
+                hover: "bg-tertiary-btn-hover",
             },
         },
     };
@@ -125,14 +125,14 @@ export class TailwindThemeAdapter {
 
         navbar: {
             base: "bg-gray-200",
-            hover: "hover:bg-gray-300",
+            hover: "bg-gray-300",
             primaryBtn: {
                 base: "bg-blue-500",
-                hover: "hover:bg-blue-600",
+                hover: "bg-blue-600",
             },
             secondaryBtn: {
                 base: "bg-gray-400",
-                hover: "hover:bg-gray-500",
+                hover: "bg-gray-500",
             },
         },
 
@@ -155,7 +155,7 @@ export class TailwindThemeAdapter {
             entryOccupation: "bg-gray-100",
             entryViewBtn: {
                 base: "bg-blue-500",
-                hover: "hover:bg-blue-600",
+                hover: "bg-blue-600",
             },
             entryBg: "bg-white",
             entryInput: "bg-gray-300",
@@ -167,11 +167,11 @@ export class TailwindThemeAdapter {
             bg: "bg-white",
             baseBtn: {
                 base: "bg-blue-500",
-                hover: "hover:bg-blue-600",
+                hover: "bg-blue-600",
             },
             activeBtn: {
                 base: "bg-blue-400",
-                hover: "hover:bg-blue-500",
+                hover: "bg-blue-500",
             },
         },
 
@@ -181,7 +181,7 @@ export class TailwindThemeAdapter {
             search: "bg-gray-300",
             btn: {
                 base: "bg-blue-500",
-                hover: "hover:bg-blue-600",
+                hover: "bg-blue-600",
             },
         },
 
@@ -189,7 +189,7 @@ export class TailwindThemeAdapter {
             bg: "bg-gray-300",
             btn: {
                 base: "bg-blue-500",
-                hover: "hover:bg-blue-600",
+                hover: "bg-blue-600",
             },
             occupation: "bg-gray-200",
             avatarBg: "bg-gray-300",
@@ -204,15 +204,15 @@ export class TailwindThemeAdapter {
         buttons: {
             primary: {
                 base: "bg-blue-500",
-                hover: "hover:bg-blue-600",
+                hover: "bg-blue-600",
             },
             secondary: {
                 base: "bg-green-500",
-                hover: "hover:bg-green-600",
+                hover: "bg-green-600",
             },
             tertiary: {
                 base: "bg-red-500",
-                hover: "hover:bg-red-600",
+                hover: "bg-red-600",
             },
         },
     };
