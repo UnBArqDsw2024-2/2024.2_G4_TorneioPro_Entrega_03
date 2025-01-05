@@ -105,6 +105,7 @@ const DashboardBody: React.FC<Props> = ({ title, items }) => {
                 {filteredItems.length !== 0 ? (
                     filteredItems.map((item) => (
                         // TODO aqui vai o ChampionshipListItem ou TeamListItem ou PlayerListItem, etc...
+                    <></>
                     ))
                 ) : (
                 <div key={0} className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}>
