@@ -72,7 +72,7 @@ docker compose down
 ### Times
 - [Testado] `GET /teams/list` - Lista todos os times
 - [Não testado] `POST /teams/create` - Cria novo time
-  - Body: { "name": "string", "description": "string" }
+  - Body: { "name": "string", "trainer": number }
 - [Testado] `POST /teams/get` - Obtém detalhes de um time específico
   - Body: { "team_id": number }
 - [Não testado] `POST /teams/update` - Atualiza time
@@ -519,7 +519,7 @@ Para rejeitar as solicitações de jogadores, você precisa fazer uma requisiç�
 `Headers:` "Content-Type: application/json"
 
 Requer Autenticação? Sim 
-- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como treinador.
 
 `Body:`
 ```bash
@@ -543,7 +543,7 @@ Para aprovar um jogador em um time, você precisa fazer uma requisição `POST` 
 `Headers:` "Content-Type: application/json"
 
 Requer Autenticação? Sim 
-- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador.
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como treinador.
 
 `Body:`
 ```bash
@@ -572,8 +572,8 @@ Requer Autenticação? Sim
 `Body:`
 ```bash
 { 
-    "championship_id": "o ID do campeonato",
-    "team_ids": [] "IDs dos times que deseja-se adicionar" 
+  "championship_id": "o ID do campeonato",
+  "team_ids": [] "IDs dos times que deseja-se adicionar" 
 }
 ```
 
@@ -597,8 +597,8 @@ Requer Autenticação? Sim
 `Body:`
 ```bash
 { 
-    "championship_id": "o ID do campeonato",
-    "team_ids": [] "IDs dos times que deseja-se excluir" 
+  "championship_id": "o ID do campeonato",
+  "team_ids": [] "IDs dos times que deseja-se excluir" 
 }
 ```
 
@@ -622,7 +622,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "trainer_id": "o ID do treinador"
+  "trainer_id": "o ID do treinador"
 }
 ```
 
@@ -632,6 +632,30 @@ ___
 
 
 ## Teams
+
+### Criando times
+
+Para criar um time, você precisa fazer uma requisição `POST` para a rota /teams/create/ com os seguintes dados:
+
+`Rota:` http://localhost:8000/teams/create/
+
+`Headers:` "Content-Type: application/json"
+
+Requer Autenticação? Sim 
+- "Auth-Type": **Bearer Token**. Vai abrir uma caixa ao lado para colocar o Token que você guardou quando fez o login como organizador ou treinador.
+
+`Body:` 
+
+```bash
+{
+  "name": "Nome do Time",
+  "trainer": "ID do treinador"
+  }
+```
+
+`Permissões`: Organizador e Treinador
+
+___
 
 ### Listando times
 
@@ -682,7 +706,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "team_id": "o ID do time"
+  "team_id": "o ID do time"
 }
 ```
 
@@ -724,7 +748,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "trainer_id": "o ID do treinador"
+  "trainer_id": "o ID do treinador"
 }
 ```
 
@@ -748,7 +772,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "trainer_id": "o ID do treinador"
+  "trainer_id": "o ID do treinador"
 }
 ```
 
@@ -772,7 +796,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "trainer_id": "o ID do treinador"
+  "trainer_id": "o ID do treinador"
 }
 ```
 
@@ -816,7 +840,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "player_id": "o ID do jogador"
+  "player_id": "o ID do jogador"
 }
 ```
 
@@ -840,7 +864,7 @@ Requer Autenticação? Sim
 
 ```bash
 {
-    "player_id": "o ID do jogador"
+  "player_id": "o ID do jogador"
 }
 ```
 
@@ -884,7 +908,7 @@ Requer Autenticação? Não
 
 ```bash
 {
-    "sport_id": "o ID do esporte"
+  "sport_id": "o ID do esporte"
 }
 ```
 

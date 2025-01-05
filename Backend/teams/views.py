@@ -5,12 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Team
 from .serializers import TeamSerializer
 from authentication.models import User
-from authentication.permissions import IsOrganizerOrTrainer
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
-    permission_classes = [IsOrganizerOrTrainer]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Team.objects.all()
