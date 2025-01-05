@@ -64,11 +64,17 @@ class Championship(models.Model):
 
     def generate_matches(self):
         """Gera todas as partidas do campeonato baseado no tipo"""
+        from .strategies import BracketMatchStrategy, PointsMatchStrategy
+        
         team_count = self.teams.count()
         if self.championship_type == 'bracket' and team_count == 16:
-            self._generate_bracket_matches()
+            strategy = BracketMatchStrategy()
         elif self.championship_type == 'points' and 10 <= team_count <= 20:
-            self._generate_points_matches()
+            strategy = PointsMatchStrategy()
+        else:
+            return
+            
+        strategy.generate_matches(self)
 
     def _generate_bracket_matches(self):
         """Gera partidas para formato de grupos + mata-mata"""

@@ -396,6 +396,106 @@ class ChampionshipAPITests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+class ChampionshipStrategyTests(TestCase):
+    def setUp(self):
+        self.sport = Sport.objects.create(name="Football")
+        self.start_date = timezone.now()
+        self.end_date = self.start_date + timedelta(days=30)
+        
+        self.trainer = User.objects.create_user(
+            username='trainer', 
+            password='12345',
+            email='trainer@test.com',
+            user_type='trainer',
+            is_approved=True
+        )
+
+    def test_bracket_strategy(self):
+        """Teste da estratégia de geração de partidas para formato bracket"""
+        championship = Championship.objects.create(
+            name="Bracket Championship",
+            description="Test",
+            sport=self.sport,
+            championship_type='bracket',
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+
+        # Criar exatamente 16 times
+        teams = []
+        for i in range(16):
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            teams.append(team)
+        
+        championship.teams.set(teams)
+        championship.generate_matches()
+
+        # Verificar se o número correto de partidas foi gerado
+        # Em um formato bracket com 16 times em 4 grupos, cada grupo tem 6 jogos
+        # Total de jogos na fase de grupos: 4 grupos * 6 jogos = 24 jogos
+        matches_count = Match.objects.filter(championship=championship).count()
+        self.assertEqual(matches_count, 24)
+
+    def test_points_strategy(self):
+        """Teste da estratégia de geração de partidas para formato points"""
+        championship = Championship.objects.create(
+            name="Points Championship",
+            description="Test",
+            sport=self.sport,
+            championship_type='points',
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+
+        # Criar 10 times (mínimo para points)
+        teams = []
+        for i in range(10):
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            teams.append(team)
+        
+        championship.teams.set(teams)
+        championship.generate_matches()
+
+        # Verificar se o número correto de partidas foi gerado
+        # Em um formato points com 10 times, cada time joga contra todos os outros uma vez
+        # Número total de jogos = (n * (n-1)) / 2, onde n é o número de times
+        expected_matches = (10 * 9) // 2  # 45 jogos
+        matches_count = Match.objects.filter(championship=championship).count()
+        self.assertEqual(matches_count, expected_matches)
+
+    def test_invalid_team_count_no_matches(self):
+        """Teste para verificar se nenhuma partida é gerada com número inválido de times"""
+        championship = Championship.objects.create(
+            name="Invalid Team Count",
+            description="Test",
+            sport=self.sport,
+            championship_type='bracket',
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+
+        # Criar 10 times (inválido para bracket que requer 16)
+        teams = []
+        for i in range(10):
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            teams.append(team)
+        
+        championship.teams.set(teams)
+        championship.generate_matches()
+
+        # Verificar que nenhuma partida foi gerada
+        matches_count = Match.objects.filter(championship=championship).count()
+        self.assertEqual(matches_count, 0)
+
 class ChampionshipJoinRequestTests(TestCase):
     def setUp(self):
         # Criar esporte do tipo team
