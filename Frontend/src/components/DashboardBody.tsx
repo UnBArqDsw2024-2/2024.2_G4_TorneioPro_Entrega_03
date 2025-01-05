@@ -1,12 +1,12 @@
-import React, { useCallback, useState } from "react";
-import { TailwindThemeAdapter } from "./adpater/TailwindThemeAdapter.tsx";
+import React, {useCallback, useState} from "react";
+import {TailwindThemeAdapter} from "./adpater/TailwindThemeAdapter.tsx";
 
 interface Props {
     title: string;
     items: Array<any>;
 }
 
-const DashboardBody: React.FC<Props> = ({ title, items }) => {
+const DashboardBody: React.FC<Props> = ({title, items}) => {
     const [filteredItems, setFilteredItems] = useState(items);
     const [theme, setTheme] = useState<"light" | "dark">("dark");
 
@@ -68,8 +68,8 @@ const DashboardBody: React.FC<Props> = ({ title, items }) => {
                                 strokeLinejoin="round"
                                 className="lucide lucide-search w-5 h-5 text-primary-text-detail"
                             >
-                                <circle cx="11" cy="11" r="8" />
-                                <path d="m21 21-4.3-4.3" />
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.3-4.3"/>
                             </svg>
                             <input
                                 onChange={handleSearch}
@@ -93,32 +93,35 @@ const DashboardBody: React.FC<Props> = ({ title, items }) => {
                                 strokeLinejoin="round"
                                 className="lucide lucide-circle-plus w-6 h-6 text-primary-text-detail lg:mr-3 mr-2"
                             >
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M8 12h8" />
-                                <path d="M12 8v8" />
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 12h8"/>
+                                <path d="M12 8v8"/>
                             </svg>
                             CADASTRAR {title}
                         </button>
                     </div>
                 </div>
-                <div className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
-                {filteredItems.length !== 0 ? (
-                    filteredItems.map((item) => (
-                        // TODO aqui vai o ChampionshipListItem ou TeamListItem ou PlayerListItem, etc...
-                    <></>
-                    ))
-                ) : (
-                <div key={0} className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}>
-                    <div className={`flex flex-col justify-center lg:h-[15vh] h-[15vh] ${colors.buttons.primary.hover} lg:text-3xl text-xl`}>
-                        <p>Sem {title.toLowerCase()} no momento...</p>
-                    </div>
+                <div
+                    className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
+                    {filteredItems.length !== 0 ? (
+                        filteredItems.map((item) => (
+                            // TODO aqui vai o ChampionshipListItem ou TeamListItem ou PlayerListItem, etc...
+                            <></>
+                        ))
+                    ) : (
+                        <div key={0}
+                             className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}>
+                            <div
+                                className={`flex flex-col justify-center lg:h-[15vh] h-[15vh] ${colors.buttons.primary.hover} lg:text-3xl text-xl`}>
+                                <p>Sem {title.toLowerCase()} no momento...</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                )}
             </div>
         </div>
-</div>
-)
-    ;
+    )
+        ;
 };
 
 export default DashboardBody;

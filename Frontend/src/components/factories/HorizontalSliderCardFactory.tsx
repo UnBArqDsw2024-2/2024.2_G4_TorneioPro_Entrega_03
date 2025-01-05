@@ -1,7 +1,7 @@
 import ChampionshipBracketCard from "../horizontal-slider/ChampionshipBracketCard";
 import ChampionshipFutureCard from "../horizontal-slider/ChampionshipFutureCard";
 import ChampionshipSliderCard from "../horizontal-slider/ChampionshipSliderCard";
-import { SliderStrategy } from "../horizontal-slider/HorizontalSlider";
+import {SliderStrategy} from "../horizontal-slider/HorizontalSlider";
 
 class CardFactory {
     static createCard(strategy: SliderStrategy, championship: any, partida: any) {

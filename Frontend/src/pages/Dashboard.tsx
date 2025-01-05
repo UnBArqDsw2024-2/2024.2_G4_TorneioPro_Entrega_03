@@ -12,13 +12,13 @@ import {useAuth} from "../context/AuthContext.tsx";
 
 const Dashboard = () => {
     const {user} = useAuth();
-    
+
     const [championshipsQntd, setChampionshipsQntd] = useState(0);
     const [trainersQntd, setTrainersQntd] = useState(0);
     const [matchQntd, setMatchQntd] = useState(0);
     const [teamQntd, setTeamQntd] = useState(0);
     const [playerQntd, setPlayerQntd] = useState(0);
-    
+
     useEffect(() => {
         // Quantidade de Campeonatos
         axios.get(`${API_BASE_URL}/championships/list/`, {
@@ -65,7 +65,7 @@ const Dashboard = () => {
             setPlayerQntd(response.data.length)
         })
     }, [user?.token])
-    
+
     return (
         <div className="grid grid-cols-4 gap-x-12 gap-y-14 mx-32">
             <Link to='/dashboard/championships'>

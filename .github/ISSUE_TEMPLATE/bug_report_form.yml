@@ -1,6 +1,6 @@
 name: Bug Report
 description: File a bug report
-labels: ["bug"]
+labels: [ "bug" ]
 body:
   - type: markdown
     attributes:
@@ -29,8 +29,8 @@ body:
       label: Steps to reproduce
       description: Describe the steps to reproduce
       placeholder: 1. Step 1 ...
-                   2. Step 2 ...
-                   3. Step 3 ...
+        2. Step 2 ...
+        3. Step 3 ...
     validations:
       required: true
   - type: textarea

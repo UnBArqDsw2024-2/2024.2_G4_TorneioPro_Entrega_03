@@ -1,6 +1,6 @@
 export const DateConverter = (dateString: string, isGmt: boolean) => {
     const sum = isGmt ? 3 : 0;
-    
+
     const date = new Date(dateString);
 
     const day = String(date.getDate()).padStart(2, '0');

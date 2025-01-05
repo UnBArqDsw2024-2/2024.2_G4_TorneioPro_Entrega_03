@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { TailwindThemeAdapter } from "./adpater/TailwindThemeAdapter.tsx";
+import React, {useCallback, useState} from "react";
+import {TailwindThemeAdapter} from "./adpater/TailwindThemeAdapter.tsx";
 import TeamModal from "./TeamModal.tsx";
 import TeamListItem from "./TeamListItem.tsx";
 
@@ -8,7 +8,7 @@ interface Props {
     items: Array<any>;
 }
 
-const DashboardTeam: React.FC<Props> = ({ title, items }) => {
+const DashboardTeam: React.FC<Props> = ({title, items}) => {
     const [filteredItems, setFilteredItems] = useState(items);
     const [theme, setTheme] = useState<"light" | "dark">("dark");
 
@@ -76,8 +76,8 @@ const DashboardTeam: React.FC<Props> = ({ title, items }) => {
                                 strokeLinejoin="round"
                                 className="lucide lucide-search w-5 h-5 text-primary-text-detail"
                             >
-                                <circle cx="11" cy="11" r="8" />
-                                <path d="m21 21-4.3-4.3" />
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.3-4.3"/>
                             </svg>
                             <input
                                 onChange={handleSearch}
@@ -89,7 +89,7 @@ const DashboardTeam: React.FC<Props> = ({ title, items }) => {
                     </div>
                     <div className="flex flex-row lg:mt-0 mt-4 lg:gap-x-6 gap-x-2">
                         <TeamModal onSubmit={handleSubmit}>
-                            <div 
+                            <div
                                 role="button"
                                 tabIndex={0}
                                 className={`${colors.dashboardCard.btn.base} hover:${colors.dashboardCard.btn.hover} lg:h-[50px] h-[40px] lg:w-[15vw] w-[40vw] rounded-[10px] flex flex-row justify-start items-center pl-3 mr-1 lg:text-lg text-sm cursor-pointer`}
@@ -104,16 +104,17 @@ const DashboardTeam: React.FC<Props> = ({ title, items }) => {
                                     strokeLinejoin="round"
                                     className="lucide lucide-circle-plus w-6 h-6 text-primary-text-detail lg:mr-3 mr-2"
                                 >
-                                    <circle cx="12" cy="12" r="10" />
-                                    <path d="M8 12h8" />
-                                    <path d="M12 8v8" />
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 12h8"/>
+                                    <path d="M12 8v8"/>
                                 </svg>
                                 CADASTRAR {title}
                             </div>
                         </TeamModal>
                     </div>
                 </div>
-                <div className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
+                <div
+                    className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
                     {filteredItems.length !== 0 ? (
                         filteredItems.map((team) => (
                             <TeamListItem

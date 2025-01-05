@@ -9,15 +9,17 @@ interface Props {
 
 const ChampionshipSituationBadge: React.FC<Props> = ({openDate, closeDate}) => {
     const isLive = IsLive(openDate, closeDate);
-    
+
     const openDateConverted = DateConverter(openDate, true);
-    
+
     return (
         <div>
             {isLive ? (
-                <div className="lg:h-[4vh] h-[43h] lg:w-[7vw] w-[26vw] bg-secondary-btn-base text-center rounded text-primary-text lg:text-2xl text-lg flex flex-col justify-center">Ocorrendo</div>
+                <div
+                    className="lg:h-[4vh] h-[43h] lg:w-[7vw] w-[26vw] bg-secondary-btn-base text-center rounded text-primary-text lg:text-2xl text-lg flex flex-col justify-center">Ocorrendo</div>
             ) : (
-                <div className="lg:h-[4vh] h-[43h] text-center text-primary-text lg:text-2xl text-lg flex flex-col justify-center">{openDateConverted}</div>
+                <div
+                    className="lg:h-[4vh] h-[43h] text-center text-primary-text lg:text-2xl text-lg flex flex-col justify-center">{openDateConverted}</div>
             )}
         </div>
     )
