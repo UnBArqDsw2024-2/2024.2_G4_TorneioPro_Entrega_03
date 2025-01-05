@@ -940,3 +940,45 @@ Requer Autenticação? Sim
 `Permissões`: Organizador
 
 ___
+
+
+# Design Patterns Utilizados
+
+## Strategy (Comportamental)
+
+**Classe:** *BracketMatchStrategy(MatchGenerationStrategy)* 
+
+Nesta estratégia:
+
+- Requer exatamente 16 times
+- Os times são divididos em 4 grupos de 4 times cada
+- Em cada grupo, cada time joga contra todos os outros times do grupo uma vez
+- Total de jogos por grupo = 6 (cada time joga 3 vezes)
+- Total de jogos na fase de grupos = 24 (4 grupos × 6 jogos)
+
+**Implementação:**
+
+![strategyBMS](/assets/strategyBMS.png)
+
+**Classe:** *BracketMatchStrategy(MatchGenerationStrategy)* 
+
+Nesta estratégia:
+
+- Aceita de 10 a 20 times
+- Cada time joga contra todos os outros times uma vez
+- Para N times, teremos:
+- Número total de jogos = (N × (N-1)) / 2
+- Por exemplo, com 10 times: (10 × 9) / 2 = 45 jogos
+- Usa um algoritmo de rotação para garantir que todos os times joguem contra todos
+
+**Implementação:**
+
+![strategyPMS](/assets/strategyPMS.png)
+
+**Uso:**
+
+![strategyUse](/assets/strategyUse.png)
+
+___
+
+
