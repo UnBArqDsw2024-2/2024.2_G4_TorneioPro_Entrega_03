@@ -5,13 +5,17 @@ from players.serializers import PlayerProfileSerializer
 
 class ChampionshipSerializer(serializers.ModelSerializer):
     teams_details = TeamSerializer(source='teams', many=True, read_only=True)
+    is_active = serializers.SerializerMethodField()
 
     class Meta:
         model = Championship
         fields = ('id', 'name', 'description', 'sport', 'championship_type',
                  'start_date', 'end_date', 'teams', 'teams_details', 
                  'is_active', 'created_at', 'updated_at')
-        read_only_fields = ('created_at', 'updated_at')
+        read_only_fields = ('created_at', 'updated_at', 'is_active')
+
+    def get_is_active(self, obj):
+        return obj.is_active
 
     def create(self, validated_data):
         teams = validated_data.pop('teams', [])

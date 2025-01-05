@@ -20,7 +20,6 @@ class Championship(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     teams = models.ManyToManyField(Team, related_name='championships', blank=True)  # Tornando o campo opcional
-    is_active = models.BooleanField(default=False)  # Mudando o default para False
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,27 +39,18 @@ class Championship(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-        # Atualiza o is_active baseado nas datas
-        now = timezone.now()
-        self.is_active = self.start_date <= now <= self.end_date
         super().save(*args, **kwargs)
         if is_new and self.teams.exists():  # Só gera partidas se houver times
             self.generate_matches()
 
-    @classmethod
-    def update_active_status(cls):
+    @property
+    def is_active(self):
+        """Verifica se o campeonato está ativo baseado nas datas"""
         now = timezone.now()
-        # Atualiza campeonatos que deveriam estar ativos mas não estão
-        cls.objects.filter(
-            Q(start_date__lte=now, end_date__gte=now, is_active=False) |  # Deveria estar ativo
-            Q(Q(end_date__lt=now) | Q(start_date__gt=now), is_active=True)  # Deveria estar inativo
-        ).update(
-            is_active=Case(
-                When(start_date__lte=now, end_date__gte=now, then=True),
-                default=False
-            ),
-            updated_at=now
-        )
+        # Garantir que todas as datas são timezone-aware
+        start = timezone.localtime(self.start_date) if timezone.is_naive(self.start_date) else self.start_date
+        end = timezone.localtime(self.end_date) if timezone.is_naive(self.end_date) else self.end_date
+        return start <= now <= end
 
     def generate_matches(self):
         """Gera todas as partidas do campeonato baseado no tipo"""

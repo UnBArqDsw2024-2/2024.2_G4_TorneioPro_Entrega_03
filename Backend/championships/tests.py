@@ -1,16 +1,19 @@
 from django.test import TestCase
-from django.utils import timezone
-from django.core.exceptions import ValidationError
-from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from django.utils import timezone
 from datetime import timedelta
-from .models import Championship, ChampionshipJoinRequest
-from teams.models import Team
+from django.core.exceptions import ValidationError
 from sports.models import Sport
-from players.models import PlayerProfile
+from teams.models import Team
 from authentication.models import User
 from matches.models import Match
+from players.models import PlayerProfile
+from .models import Championship, ChampionshipJoinRequest
+from .factories import get_championship_factory, BracketChampionshipFactory, PointsChampionshipFactory
+from .strategies import BracketMatchStrategy, PointsMatchStrategy
+from django.db.models import Q
 
 class ChampionshipModelTests(TestCase):
     def setUp(self):
@@ -169,30 +172,85 @@ class ChampionshipModelTests(TestCase):
         with self.assertRaises(ValidationError):
             championship.clean()
 
+    def test_active_status_calculation(self):
+        """Testa se o status ativo é calculado corretamente baseado nas datas"""
+        # Campeonato ativo (datas incluem agora)
+        active_championship = Championship.objects.create(
+            name="Active Championship",
+            description="Test",
+            sport=self.sport,
+            championship_type='points',
+            start_date=self.start_date - timedelta(days=1),
+            end_date=self.start_date + timedelta(days=1)
+        )
+        self.assertTrue(active_championship.is_active)
+
+        # Campeonato futuro
+        future_championship = Championship.objects.create(
+            name="Future Championship",
+            description="Test",
+            sport=self.sport,
+            championship_type='points',
+            start_date=self.start_date + timedelta(days=1),
+            end_date=self.start_date + timedelta(days=2)
+        )
+        self.assertFalse(future_championship.is_active)
+
+        # Campeonato passado
+        past_championship = Championship.objects.create(
+            name="Past Championship",
+            description="Test",
+            sport=self.sport,
+            championship_type='points',
+            start_date=self.start_date - timedelta(days=2),
+            end_date=self.start_date - timedelta(days=1)
+        )
+        self.assertFalse(past_championship.is_active)
+
+    def test_timezone_aware_dates(self):
+        """Testa se as datas com timezone são tratadas corretamente"""
+        # Criar data com timezone
+        tz = timezone.get_current_timezone()
+        start = timezone.make_aware(timezone.datetime(2025, 1, 1), tz)
+        end = timezone.make_aware(timezone.datetime(2025, 1, 2), tz)
+        
+        championship = Championship.objects.create(
+            name="Timezone Test",
+            description="Test",
+            sport=self.sport,
+            championship_type='points',
+            start_date=start,
+            end_date=end
+        )
+        
+        # Verificar se as datas mantêm o timezone
+        self.assertTrue(timezone.is_aware(championship.start_date))
+        self.assertTrue(timezone.is_aware(championship.end_date))
+
 class ChampionshipAPITests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
-        # Criar esporte do tipo team
-        self.sport = Sport.objects.create(name="Football", type="team")
-        self.start_date = timezone.now()
-        self.end_date = self.start_date + timedelta(days=30)
+        # Limpar o banco de dados
+        Championship.objects.all().delete()
+        Sport.objects.all().delete()
+        Team.objects.all().delete()
+        User.objects.all().delete()
         
-        # Criar usuários
-        self.organizer = User.objects.create_superuser(  
-            username='organizer', 
+        # Criar usuários para teste
+        self.organizer = User.objects.create_user(
+            username='organizer',
             password='12345',
             email='organizer@test.com',
             user_type='organizer'
         )
         
         self.trainer = User.objects.create_user(
-            username='trainer', 
+            username='trainer',
             password='12345',
             email='trainer@test.com',
             user_type='trainer',
             is_approved=True
         )
-        
+
         self.player = User.objects.create_user(
             username='player', 
             password='12345',
@@ -223,6 +281,13 @@ class ChampionshipAPITests(APITestCase):
             )
             self.team.players.add(player)
         
+        # Criar esporte
+        self.sport = Sport.objects.create(name="Football", type="team")
+        
+        # Definir datas padrão para testes
+        self.start_date = timezone.now()
+        self.end_date = self.start_date + timedelta(days=30)
+        
         # Criar campeonato
         self.championship = Championship.objects.create(
             name="Test Championship",
@@ -242,18 +307,27 @@ class ChampionshipAPITests(APITestCase):
 
     def test_create_championship(self):
         """Teste de criação de campeonato via API"""
+        # Autenticar como organizador
         self.client.force_authenticate(user=self.organizer)
-        url = reverse('championship-create')
+        
+        url = reverse('championship-create')  # Corrigindo a URL
+        start_date = timezone.now()
+        end_date = start_date + timedelta(days=30)
+        
         data = {
-            'name': 'New Championship',
-            'description': 'New Description',
-            'sport': self.sport.id,
+            'name': 'Test Championship',
+            'description': 'Test Description',
+            'sport': Sport.objects.create(name="Football").id,
             'championship_type': 'points',
-            'start_date': (self.start_date + timedelta(days=1)).isoformat(),
-            'end_date': self.end_date.isoformat()
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat()
         }
+        
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Championship.objects.count(), 2)
+        championship = Championship.objects.last()
+        self.assertEqual(championship.name, 'Test Championship')
 
     def test_get_championship(self):
         """Teste de obtenção de campeonato específico"""
@@ -284,19 +358,42 @@ class ChampionshipAPITests(APITestCase):
 
     def test_join_request(self):
         """Teste de solicitação de participação"""
-        self.client.force_authenticate(user=self.player)
+        # Criar um jogador para fazer a solicitação
+        player_user = User.objects.create_user(
+            username='test_player_join',  # Nome único
+            password='12345',
+            email='test_player_join@test.com',
+            user_type='player'
+        )
+        player = PlayerProfile.objects.create(
+            user=player_user,
+            birth_date='2000-01-01',
+            position='Forward'
+        )
+        
+        # Criar um time para o jogador
+        team = Team.objects.create(
+            name='Test Team Join',  # Nome único
+            trainer=self.trainer
+        )
+        
+        # Autenticar como jogador
+        self.client.force_authenticate(user=player_user)
+        
         url = reverse('championship-join-request')
         data = {
             'championship_id': self.championship.id,
-            'team_id': self.team.id
+            'team_id': team.id
         }
-        response = self.client.post(url, data)
-        print("Response data:", response.data)  # Para ver o erro específico
+        
+        response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Verificar se a solicitação foi criada
         self.assertTrue(ChampionshipJoinRequest.objects.filter(
             championship=self.championship,
-            player=self.player.player_profile,
-            team=self.team,
+            player=player,
+            team=team,
             status='pending'
         ).exists())
 
@@ -383,7 +480,7 @@ class ChampionshipAPITests(APITestCase):
         data = {
             'name': 'Unauthorized Championship',
             'description': 'Test',
-            'sport': self.sport.id,
+            'sport': Sport.objects.create(name="Football").id,
             'championship_type': 'points',
             'start_date': self.start_date.isoformat(),
             'end_date': self.end_date.isoformat()
@@ -395,6 +492,38 @@ class ChampionshipAPITests(APITestCase):
         self.client.force_authenticate(user=self.player)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_championship_status_in_response(self):
+        """Testa se o status ativo é retornado corretamente na API"""
+        self.client.force_authenticate(user=self.organizer)
+        url = reverse('championship-create')
+        
+        # Criar campeonato ativo
+        now = timezone.now()
+        data = {
+            'name': 'Active Championship',
+            'description': 'Test Description',
+            'sport': self.sport.id,
+            'championship_type': 'points',
+            'start_date': (now - timedelta(days=1)).isoformat(),
+            'end_date': (now + timedelta(days=1)).isoformat()
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data['is_active'])
+        
+        # Criar campeonato futuro
+        data = {
+            'name': 'Future Championship',
+            'description': 'Test Description',
+            'sport': self.sport.id,
+            'championship_type': 'points',
+            'start_date': (now + timedelta(days=1)).isoformat(),
+            'end_date': (now + timedelta(days=2)).isoformat()
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(response.data['is_active'])
 
 class ChampionshipStrategyTests(TestCase):
     def setUp(self):
@@ -569,3 +698,177 @@ class ChampionshipJoinRequestTests(TestCase):
                 team=self.team,
                 status='pending'
             )
+
+class ChampionshipFactoryTests(TestCase):
+    def setUp(self):
+        self.sport = Sport.objects.create(name="Football")
+        # Criar treinador para os times
+        self.trainer = User.objects.create_user(
+            username='trainer',
+            password='12345',
+            email='trainer@example.com',
+            user_type='trainer',
+            is_approved=True
+        )
+        # Criar times para teste
+        self.teams = []
+        for i in range(20):
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            self.teams.append(team)
+
+    def test_bracket_factory_creation(self):
+        """Testa se a BracketChampionshipFactory cria corretamente"""
+        factory = BracketChampionshipFactory()
+        data = {
+            'name': 'Bracket Championship',
+            'description': 'Test',
+            'sport': self.sport,
+            'start_date': timezone.now(),
+            'end_date': timezone.now() + timedelta(days=30)
+        }
+        
+        # Teste com 16 times (válido)
+        teams = self.teams[:16]
+        championship = factory.create_championship(data, teams)
+        self.assertEqual(championship.championship_type, 'bracket')
+        self.assertEqual(championship.teams.count(), 16)
+        
+        # Teste com número inválido de times
+        teams = self.teams[:10]
+        with self.assertRaises(ValidationError):
+            factory.create_championship(data, teams)
+
+    def test_points_factory_creation(self):
+        """Testa se a PointsChampionshipFactory cria corretamente"""
+        factory = PointsChampionshipFactory()
+        data = {
+            'name': 'Points Championship',
+            'description': 'Test',
+            'sport': self.sport,
+            'start_date': timezone.now(),
+            'end_date': timezone.now() + timedelta(days=30)
+        }
+        
+        # Teste com 10 times (válido)
+        teams = self.teams[:10]
+        championship = factory.create_championship(data, teams)
+        self.assertEqual(championship.championship_type, 'points')
+        self.assertEqual(championship.teams.count(), 10)
+        
+        # Teste com número inválido de times
+        teams = self.teams[:5]
+        with self.assertRaises(ValidationError):
+            factory.create_championship(data, teams)
+
+    def test_factory_invalid_data(self):
+        """Testa comportamento das factories com dados inválidos"""
+        factory = BracketChampionshipFactory()
+        
+        # Teste sem sport
+        data = {
+            'name': 'Invalid Championship',
+            'description': 'Test',
+            'start_date': timezone.now(),
+            'end_date': timezone.now() + timedelta(days=30)
+        }
+        with self.assertRaises(ValidationError):
+            factory.create_championship(data, [])
+        
+        # Teste com datas inválidas
+        data['sport'] = self.sport
+        data['end_date'] = timezone.now() - timedelta(days=30)
+        with self.assertRaises(ValidationError):
+            factory.create_championship(data, [])
+
+class ChampionshipStrategyTests(TestCase):
+    def setUp(self):
+        self.sport = Sport.objects.create(name="Football")
+        # Criar treinador para os times
+        self.trainer = User.objects.create_user(
+            username='trainer',
+            password='12345',
+            email='trainer@example.com',
+            user_type='trainer',
+            is_approved=True
+        )
+        # Criar times para teste
+        self.teams = []
+        for i in range(16):
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            self.teams.append(team)
+        
+        # Criar campeonato para teste
+        self.championship = Championship.objects.create(
+            name="Test Championship",
+            description="Test",
+            sport=self.sport,
+            championship_type='bracket',
+            start_date=timezone.now(),
+            end_date=timezone.now() + timedelta(days=30)
+        )
+        for team in self.teams:
+            self.championship.teams.add(team)
+
+    def test_bracket_strategy_matches(self):
+        """Testa geração de partidas na estratégia bracket"""
+        strategy = BracketMatchStrategy()
+        strategy.generate_matches(self.championship)
+        
+        # Deve gerar 15 partidas (8 oitavas + 4 quartas + 2 semis + 1 final)
+        matches = self.championship.matches.all()
+        self.assertEqual(matches.count(), 15)
+        
+        # Verificar estrutura das partidas
+        eighth_matches = matches.filter(phase='eighth')
+        self.assertEqual(eighth_matches.count(), 8)  # 8 partidas nas oitavas
+        
+        quarter_matches = matches.filter(phase='quarter')
+        self.assertEqual(quarter_matches.count(), 4)  # 4 partidas nas quartas
+        
+        semi_matches = matches.filter(phase='semi')
+        self.assertEqual(semi_matches.count(), 2)  # 2 partidas nas semis
+        
+        final_matches = matches.filter(phase='final')
+        self.assertEqual(final_matches.count(), 1)  # 1 partida na final
+
+    def test_points_strategy_matches(self):
+        """Testa geração de partidas na estratégia points"""
+        self.championship.championship_type = 'points'
+        self.championship.save()
+        
+        strategy = PointsMatchStrategy()
+        strategy.generate_matches(self.championship)
+        
+        # Cada time deve jogar contra todos os outros times
+        total_teams = self.championship.teams.count()
+        expected_matches = (total_teams * (total_teams - 1)) // 2
+        
+        matches = self.championship.matches.all()
+        self.assertEqual(matches.count(), expected_matches)
+        
+        # Verificar se cada time joga contra todos os outros
+        for team in self.teams:
+            team_matches = matches.filter(Q(team1=team) | Q(team2=team))
+            self.assertEqual(team_matches.count(), total_teams - 1)
+
+    def test_factory_strategy_integration(self):
+        """Testa integração entre factory e strategy"""
+        # Criar campeonato via factory
+        factory = BracketChampionshipFactory()
+        data = {
+            'name': 'Integration Test',
+            'description': 'Test',
+            'sport': self.sport,
+            'start_date': timezone.now(),
+            'end_date': timezone.now() + timedelta(days=30)
+        }
+        
+        # Testar se as partidas são geradas corretamente após a criação
+        championship = factory.create_championship(data, self.teams)
+        self.assertEqual(championship.matches.count(), 15)  # Deve ter todas as partidas do bracket{{ ... }}
