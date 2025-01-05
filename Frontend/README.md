@@ -98,7 +98,6 @@ docker compose up --build -d
 
 ---
 
-
 ## **4. Executar o Projeto**
 
 ### **4.1 Ambiente de Desenvolvimento**
@@ -121,7 +120,8 @@ npm run watch:css
 
 ### **4.3 Ambiente de Desenvolvimento na Network**
 
-Para rodar o servidor de desenvolvimento na Network (Wifi), útil para abrir o Front pelo celular e verificar **Responsividade**:
+Para rodar o servidor de desenvolvimento na Network (Wifi), útil para abrir o Front pelo celular e verificar *
+*Responsividade**:
 
 ```bash
 npm run dev:network
@@ -130,7 +130,6 @@ npm run dev:network
 - Abra o navegador e acesse **Link: Network que aparece no terminal/console** (varia conforme o IP do wifi).
 
 ---
-
 
 ## **5. Scripts Disponíveis no Projeto**
 
@@ -183,16 +182,16 @@ npm run dev:network
 
     - Certifique-se de que o comando `npm run watch:css` está sendo executado.
 
-
-
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md)
+  uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast
+  Refresh
 
 ## Expanding the ESLint configuration
 
@@ -212,7 +211,8 @@ export default tseslint.config({
 })
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or
+  `tseslint.configs.strictTypeChecked`
 - Optionally add `...tseslint.configs.stylisticTypeChecked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
 

@@ -16,14 +16,14 @@ export class TailwindThemeAdapter {
 
         navbar: {
             base: "bg-navbar",
-            hover: "bg-navbar-hover",
+            hover: "hover:bg-navbar-hover",
             primaryBtn: {
                 base: "bg-navbar-primary-btn-base",
-                hover: "bg-navbar-primary-btn-hover",
+                hover: "hover:bg-navbar-primary-btn-hover",
             },
             secondaryBtn: {
                 base: "bg-navbar-secondary-btn-base",
-                hover: "bg-navbar-secondary-btn-hover",
+                hover: "hover:bg-navbar-secondary-btn-hover",
             },
         },
 
@@ -46,7 +46,7 @@ export class TailwindThemeAdapter {
             entryOccupation: "bg-modal-entry-occupation",
             entryViewBtn: {
                 base: "bg-modal-entry-view-btn-base",
-                hover: "bg-modal-entry-view-btn-hover",
+                hover: "hover:bg-modal-entry-view-btn-hover",
             },
             entryBg: "bg-modal-entry-bg",
             entryInput: "bg-modal-entry-input",
@@ -58,11 +58,11 @@ export class TailwindThemeAdapter {
             bg: "bg-sidebar-bg",
             baseBtn: {
                 base: "bg-sidebar-base-btn-base",
-                hover: "bg-sidebar-base-btn-hover",
+                hover: "hover:bg-sidebar-base-btn-hover",
             },
             activeBtn: {
                 base: "bg-sidebar-active-btn-base",
-                hover: "bg-sidebar-active-btn-hover",
+                hover: "hover:bg-sidebar-active-btn-hover",
             },
         },
 
@@ -80,7 +80,7 @@ export class TailwindThemeAdapter {
             bg: "bg-list-item-bg",
             btn: {
                 base: "bg-list-item-btn-base",
-                hover: "bg-list-item-btn-hover",
+                hover: "hover:bg-list-item-btn-hover",
             },
             occupation: "bg-list-item-occupation",
             avatarBg: "bg-list-item-avatar-bg",
@@ -95,15 +95,15 @@ export class TailwindThemeAdapter {
         buttons: {
             primary: {
                 base: "bg-primary-btn-base",
-                hover: "bg-primary-btn-hover",
+                hover: "hover:bg-primary-btn-hover",
             },
             secondary: {
                 base: "bg-secondary-btn-base",
-                hover: "bg-secondary-btn-hover",
+                hover: "hover:bg-secondary-btn-hover",
             },
             tertiary: {
                 base: "bg-tertiary-btn-base",
-                hover: "bg-tertiary-btn-hover",
+                hover: "hover:bg-tertiary-btn-hover",
             },
         },
     };
@@ -112,115 +112,119 @@ export class TailwindThemeAdapter {
         transparent: "transparent",
         current: "currentColor",
 
-        bodyBackground: "bg-white",
-        bodyBackgroundTo: "bg-gray-100",
+        bodyBackground: "bg-light-body-background",
+        bodyBackgroundTo: "bg-light-body-background-to",
 
         text: {
-            primary: "text-gray-900",
-            secondary: "text-gray-700",
-            detail: "text-gray-600",
-            accent: "text-blue-600",
-            placeholder: "placeholder-gray-400",
+            primary: "text-light-primary-text",
+            secondary: "text-light-secondary-text",
+            detail: "text-light-primary-text-detail",
+            accent: "text-light-accent-text",
+            placeholder: "placeholder-lightFormPlaceholderText",
         },
 
         navbar: {
-            base: "bg-gray-200",
-            hover: "bg-gray-300",
+            base: "bg-light-navbar",
+            hover: "hover:bg-light-navbar-hover",
             primaryBtn: {
-                base: "bg-blue-500",
-                hover: "bg-blue-600",
+                base: "bg-light-navbar-primary-btn-base",
+                hover: "hover:bg-light-navbar-primary-btn-hover",
             },
             secondaryBtn: {
-                base: "bg-gray-400",
-                hover: "bg-gray-500",
+                base: "bg-light-navbar-secondary-btn-base",
+                hover: "hover:bg-light-navbar-secondary-btn-hover",
             },
         },
 
         slider: {
-            active: "bg-gray-300",
-            activeSearch: "bg-gray-400",
-            liveBadge: "bg-green-500",
-            future: "bg-gray-200",
-            futureSearch: "bg-gray-300",
-            occupation: "bg-gray-100",
+            active: "bg-light-slider-active",
+            activeSearch: "bg-light-slider-active-search",
+            liveBadge: "bg-light-slider-active-live-badge",
+            future: "bg-light-slider-future",
+            futureSearch: "bg-light-slider-future-search",
+            occupation: "bg-light-slider-occupation",
         },
 
         card: {
-            titleBg: "bg-gray-200",
-            bg: "bg-white",
+            titleBg: "bg-light-card-title-bg",
+            bg: "bg-light-card-bg",
         },
 
         modal: {
-            entryTitleBg: "bg-gray-200",
-            entryOccupation: "bg-gray-100",
+            entryTitleBg: "bg-light-modal-entry-title-bg",
+            entryOccupation: "bg-light-modal-entry-occupation",
             entryViewBtn: {
-                base: "bg-blue-500",
-                hover: "bg-blue-600",
+                base: "bg-light-modal-entry-view-btn-base",
+                hover: "hover:bg-light-modal-entry-view-btn-hover",
             },
-            entryBg: "bg-white",
-            entryInput: "bg-gray-300",
+            entryBg: "bg-light-modal-entry-bg",
+            entryInput: "bg-light-modal-entry-input",
         },
 
         sidebar: {
-            bodyBg: "bg-gray-100",
-            titleBg: "bg-gray-200",
-            bg: "bg-white",
+            bodyBg: "bg-light-sidebar-body-bg",
+            titleBg: "bg-light-sidebar-title-bg",
+            bg: "bg-light-sidebar-bg",
             baseBtn: {
-                base: "bg-blue-500",
-                hover: "bg-blue-600",
+                base: "bg-light-sidebar-base-btn-base",
+                hover: "hover:bg-light-sidebar-base-btn-hover",
             },
             activeBtn: {
-                base: "bg-blue-400",
-                hover: "bg-blue-500",
+                base: "bg-light-sidebar-active-btn-base",
+                hover: "hover:bg-light-sidebar-active-btn-hover",
             },
         },
 
         dashboardCard: {
-            titleBg: "bg-gray-200",
-            bg: "bg-white",
-            search: "bg-gray-300",
+            titleBg: "bg-light-dashboard-card-title-bg",
+            bg: "bg-light-dashboard-card-bg",
+            search: "bg-light-dashboard-card-search",
             btn: {
-                base: "bg-blue-500",
-                hover: "bg-blue-600",
+                base: "bg-light-dashboard-card-btn-base",
+                hover: "hover:bg-light-dashboard-card-btn-hover",
             },
         },
 
         listItem: {
-            bg: "bg-gray-300",
+            bg: "bg-light-list-item-bg",
             btn: {
-                base: "bg-blue-500",
-                hover: "bg-blue-600",
+                base: "bg-light-list-item-btn-base",
+                hover: "hover:bg-light-list-item-btn-hover",
             },
-            occupation: "bg-gray-200",
-            avatarBg: "bg-gray-300",
+            occupation: "bg-light-list-item-occupation",
+            avatarBg: "bg-light-list-item-avatar-bg",
         },
 
         formModal: {
-            bg: "bg-white",
-            input: "bg-gray-300",
-            checkInput: "bg-blue-500",
+            bg: "bg-light-form-modal-bg",
+            input: "bg-light-form-modal-input",
+            checkInput: "bg-light-form-modal-check-input",
         },
 
         buttons: {
             primary: {
-                base: "bg-blue-500",
-                hover: "bg-blue-600",
+                base: "bg-light-primary-btn-base",
+                hover: "hover:bg-light-primary-btn-hover",
             },
             secondary: {
-                base: "bg-green-500",
-                hover: "bg-green-600",
+                base: "bg-light-secondary-btn-base",
+                hover: "hover:bg-light-secondary-btn-hover",
             },
             tertiary: {
-                base: "bg-red-500",
-                hover: "bg-red-600",
+                base: "bg-light-tertiary-btn-base",
+                hover: "hover:bg-light-tertiary-btn-hover",
             },
         },
     };
 
-    private static currentTheme = "dark";
+    private static currentTheme = localStorage.getItem('theme') || 'dark';
 
     static setTheme(theme: "light" | "dark") {
-        this.currentTheme = theme;
+        localStorage.setItem('theme', theme);
+    }
+
+    static getTheme() {
+        return localStorage.getItem('theme') || 'dark';
     }
 
     static getColors() {
