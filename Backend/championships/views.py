@@ -19,7 +19,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.action == 'list' or self.action == 'get_championship':
+        if self.action in ['list', 'get_championship', 'standings']:
             return [AllowAny()]
         if self.action in ['create', 'update', 'destroy', 'addteams', 'remteams']:
             return [IsOrganizer()]  # Apenas organizadores podem criar/editar/excluir campeonatos
@@ -306,3 +306,30 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    @action(detail=False, methods=['post'])
+    def standings(self, request):
+        """Retorna a classificação do campeonato baseado no ID fornecido no body"""
+        championship_id = request.data.get('championship_id')
+        
+        try:
+            championship = Championship.objects.get(id=championship_id)
+        except Championship.DoesNotExist:
+            return Response(
+                {"error": "Championship not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        standings = championship.get_standings()
+        
+        # Formata a resposta
+        response_data = [{
+            'team_name': item['team'].name,
+            'points': item['points'],
+            'matches_played': item['matches_played'],
+            'wins': item['wins'],
+            'draws': item['draws'],
+            'losses': item['losses']
+        } for item in standings]
+        
+        return Response(response_data)

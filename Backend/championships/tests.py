@@ -525,6 +525,20 @@ class ChampionshipAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertFalse(response.data['is_active'])
 
+    def test_standings_unauthenticated_access(self):
+        """Testa se usuários não autenticados podem acessar a classificação"""
+        # Remove a autenticação
+        self.client.force_authenticate(user=None)
+        
+        url = reverse('championship-standings')
+        response = self.client.post(url, {'championship_id': self.championship.id})
+        
+        # Verifica se o acesso é permitido
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Verifica se retorna uma lista vazia já que não há times nem partidas
+        self.assertEqual(len(response.data), 0)
+
 class ChampionshipStrategyTests(TestCase):
     def setUp(self):
         self.sport = Sport.objects.create(name="Football")
@@ -871,4 +885,147 @@ class ChampionshipStrategyTests(TestCase):
         
         # Testar se as partidas são geradas corretamente após a criação
         championship = factory.create_championship(data, self.teams)
-        self.assertEqual(championship.matches.count(), 15)  # Deve ter todas as partidas do bracket{{ ... }}
+        self.assertEqual(championship.matches.count(), 15)  # Deve ter todas as partidas do bracket
+
+class ChampionshipStandingsTests(APITestCase):
+    def setUp(self):
+        # Criar usuário organizador
+        self.organizer = User.objects.create_user(
+            username='organizer', 
+            password='12345',
+            email='organizer@test.com',
+            user_type='organizer'
+        )
+        
+        # Criar esporte
+        self.sport = Sport.objects.create(name="Football")
+        
+        # Criar campeonato
+        self.championship = Championship.objects.create(
+            name="Test Championship",
+            description="Test Description",
+            sport=self.sport,
+            championship_type='points',
+            start_date=timezone.now(),
+            end_date=timezone.now() + timedelta(days=30)
+        )
+        
+        # Criar times
+        self.team1 = Team.objects.create(name="Team 1", trainer=self.organizer)
+        self.team2 = Team.objects.create(name="Team 2", trainer=self.organizer)
+        self.team3 = Team.objects.create(name="Team 3", trainer=self.organizer)
+        
+        # Adicionar times ao campeonato
+        self.championship.teams.add(self.team1, self.team2, self.team3)
+        
+        # Criar algumas partidas com resultados
+        Match.objects.create(
+            championship=self.championship,
+            team1=self.team1,
+            team2=self.team2,
+            team1_score=2,
+            team2_score=1,
+            match_date=timezone.now(),
+            is_finished=True
+        )
+        
+        Match.objects.create(
+            championship=self.championship,
+            team1=self.team2,
+            team2=self.team3,
+            team1_score=1,
+            team2_score=1,
+            match_date=timezone.now(),
+            is_finished=True
+        )
+        
+        Match.objects.create(
+            championship=self.championship,
+            team1=self.team1,
+            team2=self.team3,
+            team1_score=3,
+            team2_score=0,
+            match_date=timezone.now(),
+            is_finished=True
+        )
+        
+        # Login
+        self.client.force_authenticate(user=self.organizer)
+
+    def test_get_standings_calculation(self):
+        """Testa se o cálculo de pontos está correto"""
+        standings = self.championship.get_standings()
+        
+        # Time 1: 2 vitórias (6 pontos)
+        team1_stats = next(s for s in standings if s['team'].id == self.team1.id)
+        self.assertEqual(team1_stats['points'], 6)
+        self.assertEqual(team1_stats['matches_played'], 2)
+        self.assertEqual(team1_stats['wins'], 2)
+        self.assertEqual(team1_stats['draws'], 0)
+        self.assertEqual(team1_stats['losses'], 0)
+        
+        # Time 2: 1 derrota, 1 empate (1 ponto)
+        team2_stats = next(s for s in standings if s['team'].id == self.team2.id)
+        self.assertEqual(team2_stats['points'], 1)
+        self.assertEqual(team2_stats['matches_played'], 2)
+        self.assertEqual(team2_stats['wins'], 0)
+        self.assertEqual(team2_stats['draws'], 1)
+        self.assertEqual(team2_stats['losses'], 1)
+        
+        # Time 3: 1 derrota, 1 empate (1 ponto)
+        team3_stats = next(s for s in standings if s['team'].id == self.team3.id)
+        self.assertEqual(team3_stats['points'], 1)
+        self.assertEqual(team3_stats['matches_played'], 2)
+        self.assertEqual(team3_stats['wins'], 0)
+        self.assertEqual(team3_stats['draws'], 1)
+        self.assertEqual(team3_stats['losses'], 1)
+
+    def test_standings_endpoint(self):
+        """Testa o endpoint de classificação"""
+        url = reverse('championship-standings')
+        response = self.client.post(url, {'championship_id': self.championship.id})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Verifica se retornou 3 times
+        self.assertEqual(len(response.data), 3)
+        
+        # Verifica se o primeiro colocado é o time 1 (6 pontos)
+        self.assertEqual(response.data[0]['team_name'], 'Team 1')
+        self.assertEqual(response.data[0]['points'], 6)
+        
+        # Verifica se os outros times têm 1 ponto cada
+        self.assertEqual(response.data[1]['points'], 1)
+        self.assertEqual(response.data[2]['points'], 1)
+
+    def test_standings_invalid_championship(self):
+        """Testa o endpoint com ID de campeonato inválido"""
+        url = reverse('championship-standings')
+        response = self.client.post(url, {'championship_id': 9999})
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], 'Championship not found')
+
+    def test_standings_missing_championship_id(self):
+        """Testa o endpoint sem fornecer championship_id"""
+        url = reverse('championship-standings')
+        response = self.client.post(url, {})
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], 'Championship not found')
+
+    def test_standings_unauthenticated_access(self):
+        """Testa se usuários não autenticados podem acessar a classificação"""
+        # Remove a autenticação
+        self.client.force_authenticate(user=None)
+        
+        url = reverse('championship-standings')
+        response = self.client.post(url, {'championship_id': self.championship.id})
+        
+        # Verifica se o acesso é permitido
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Verifica se os dados estão corretos
+        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data[0]['team_name'], 'Team 1')
+        self.assertEqual(response.data[0]['points'], 6)

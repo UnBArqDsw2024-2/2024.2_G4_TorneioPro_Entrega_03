@@ -149,6 +149,51 @@ class Championship(models.Model):
                 )
                 match_date += timedelta(days=days_between_matches)
 
+    def get_standings(self):
+        """Calcula a classificação do campeonato com pontos, jogos, vitórias, empates e derrotas"""
+        standings = {}
+        
+        # Inicializa estatísticas para cada time
+        for team in self.teams.all():
+            standings[team.id] = {
+                'team': team,
+                'points': 0,
+                'matches_played': 0,
+                'wins': 0,
+                'draws': 0,
+                'losses': 0
+            }
+        
+        # Calcula pontos baseado nas partidas finalizadas
+        for match in self.matches.filter(is_finished=True):
+            team1_stats = standings[match.team1.id]
+            team2_stats = standings[match.team2.id]
+            
+            # Incrementa jogos
+            team1_stats['matches_played'] += 1
+            team2_stats['matches_played'] += 1
+            
+            # Calcula resultado
+            if match.team1_score > match.team2_score:
+                team1_stats['points'] += 3
+                team1_stats['wins'] += 1
+                team2_stats['losses'] += 1
+            elif match.team2_score > match.team1_score:
+                team2_stats['points'] += 3
+                team2_stats['wins'] += 1
+                team1_stats['losses'] += 1
+            else:
+                team1_stats['points'] += 1
+                team2_stats['points'] += 1
+                team1_stats['draws'] += 1
+                team2_stats['draws'] += 1
+        
+        # Converte para lista e ordena por pontos
+        standings_list = list(standings.values())
+        standings_list.sort(key=lambda x: (-x['points'], -x['wins']))
+        
+        return standings_list
+
 class ChampionshipJoinRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
