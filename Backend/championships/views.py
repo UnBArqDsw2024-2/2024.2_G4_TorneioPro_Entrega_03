@@ -63,17 +63,30 @@ class ChampionshipViewSet(BaseViewSet):
 
     def prepare_data_for_update(self, request_data: dict) -> dict:
         """Prepara os dados para atualização."""
-        return {
-            'name': request_data.get('name'),
-            'description': request_data.get('description'),
-            'sport_id': request_data.get('sport_id'),
-            'sport_type': request_data.get('sport_type'),
-            'championship_type': request_data.get('championship_type', 'points'),
-            'start_date': request_data.get('start_date'),
-            'end_date': request_data.get('end_date'),
-            'is_active': request_data.get('is_active', False),
-            'updated_at': datetime.now()
-        }
+        data = {}
+        
+        # Apenas inclui campos que foram fornecidos no request
+        if 'name' in request_data:
+            data['name'] = request_data['name']
+        if 'description' in request_data:
+            data['description'] = request_data['description']
+        if 'sport_id' in request_data:
+            data['sport_id'] = request_data['sport_id']
+        if 'sport_type' in request_data:
+            data['sport_type'] = request_data['sport_type']
+        if 'championship_type' in request_data:
+            data['championship_type'] = request_data['championship_type']
+        if 'start_date' in request_data:
+            data['start_date'] = request_data['start_date']
+        if 'end_date' in request_data:
+            data['end_date'] = request_data['end_date']
+        if 'is_active' in request_data:
+            data['is_active'] = request_data['is_active']
+            
+        # Sempre atualiza o updated_at
+        data['updated_at'] = datetime.now()
+        
+        return data
 
     def list(self, request):
         """Lista todos os campeonatos."""
