@@ -7,22 +7,20 @@ interface ChampionshipStrategy {
 }
 
 // Concrete Strategies
-const AmateurChampionshipStrategy: ChampionshipStrategy = {
+const SimpleChampionshipStrategy: ChampionshipStrategy = {
   validateForm: (data: FormData) => {
-    // Amateur championships have simpler validation
+    // Basic validation
     return data.name.length >= 3 && !!data.sport && !!data.startDate;
   },
   prepareSubmission: (data: FormData) => ({
     ...data,
-    category: 'Amador',
-    // Add default values specific to amateur championships
-    description: data.description || 'Campeonato Amador',
+    description: data.description || 'Campeonato',
   })
 };
 
-const ProfessionalChampionshipStrategy: ChampionshipStrategy = {
+const AdvancedChampionshipStrategy: ChampionshipStrategy = {
   validateForm: (data: FormData) => {
-    // Professional championships need more strict validation
+    // Advanced validation with all fields
     return (
       data.name.length >= 5 &&
       !!data.sport &&
@@ -34,9 +32,7 @@ const ProfessionalChampionshipStrategy: ChampionshipStrategy = {
   },
   prepareSubmission: (data: FormData) => ({
     ...data,
-    category: 'Profissional',
-    // Add any professional-specific data transformations
-    description: `Campeonato Profissional: ${data.description}`,
+    description: `${data.description} (${data.sport})`,
   })
 };
 
@@ -46,7 +42,6 @@ interface FormData {
   description: string;
   startDate: string;
   endDate: string;
-  category: string;
 }
 
 interface ChampionshipModalProps {
@@ -55,7 +50,6 @@ interface ChampionshipModalProps {
 }
 
 const SPORTS = ['Futebol', 'Basquete', 'Vôlei', 'Tênis', 'Outros'];
-const CATEGORIES = ['Amador', 'Profissional', 'Juvenil', 'Master'];
 
 const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode; }) => {
   if (!isOpen) return null;
@@ -108,24 +102,20 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
     sport: '',
     description: '',
     startDate: '',
-    endDate: '',
-    category: '',
+    endDate: ''
   });
   
-  // Strategy selection based on category
-  const [currentStrategy, setCurrentStrategy] = useState<ChampionshipStrategy>(AmateurChampionshipStrategy);
+  // Strategy selection based on whether all fields are required
+  const [isAdvancedForm, setIsAdvancedForm] = useState(false);
+  const currentStrategy = isAdvancedForm ? AdvancedChampionshipStrategy : SimpleChampionshipStrategy;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     
-    // Update strategy when category changes
-    if (name === 'category') {
-      setCurrentStrategy(
-        value === 'Profissional' 
-          ? ProfessionalChampionshipStrategy 
-          : AmateurChampionshipStrategy
-      );
+    // Update strategy based on form complexity (e.g., if description is filled)
+    if (name === 'description' || name === 'endDate') {
+      setIsAdvancedForm(!!value);
     }
   };
 
@@ -142,7 +132,6 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
         description: '',
         startDate: '',
         endDate: '',
-        category: '',
       });
       setIsModalOpen(false);
     } else {
@@ -188,7 +177,7 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
             onChange={handleChange} 
             rows={4} 
             className={`${inputClassName} resize-none`}
-            required={formData.category === 'Profissional'}
+            required={isAdvancedForm}
           />
           
           <div className="grid grid-cols-2 gap-3">
@@ -211,21 +200,10 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
                 value={formData.endDate} 
                 onChange={handleChange} 
                 className={inputClassName}
-                required={formData.category === 'Profissional'}
+                required={isAdvancedForm}
               />
             </div>
           </div>
-          
-          <select 
-            name="category" 
-            value={formData.category} 
-            onChange={handleChange} 
-            className={selectClassName}
-            required
-          >
-            <option value="">Selecione a Categoria...</option>
-            {CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
-          </select>
           
           <button
             type="submit"
