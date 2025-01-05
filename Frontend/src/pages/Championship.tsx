@@ -46,7 +46,7 @@ const Championship: React.FC = () => {
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <div className="container mx-auto px-4">
                 <DashboardChapionship 
-                    title="Campeonato"
+                    title="CAMPEONATOS"
                     items={mockChampionships}
                 >
                     <div className="space-y-4 mt-4">
