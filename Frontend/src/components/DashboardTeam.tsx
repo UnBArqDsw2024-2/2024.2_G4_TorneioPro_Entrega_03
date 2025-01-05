@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { TailwindThemeAdapter } from "./adpater/TailwindThemeAdapter.tsx";
 import TeamModal from "./TeamModal.tsx";
+import TeamListItem from "./TeamListItem.tsx";
 
 interface Props {
     title: string;
@@ -17,15 +18,14 @@ const DashboardTeam: React.FC<Props> = ({ title, items }) => {
 
     const handleSearch = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const search = e.target.value;
+            const search = e.target.value.toLowerCase();
             if (search === "") {
                 setFilteredItems(items);
             } else {
                 const filtered = items.filter((item) => {
                     return (
-                        item.nome.toLowerCase().includes(search.toLowerCase()) ||
-                        item.email.toLowerCase().includes(search.toLowerCase()) ||
-                        item.matricula.toLowerCase().includes(search.toLowerCase())
+                        item.name?.toLowerCase().includes(search) ||
+                        item.description?.toLowerCase().includes(search)
                     );
                 });
                 setFilteredItems(filtered);
@@ -37,6 +37,14 @@ const DashboardTeam: React.FC<Props> = ({ title, items }) => {
     const handleSubmit = (data) => {
         // Adicione aqui a lógica para lidar com o envio do formulário
         console.log('Form submitted:', data);
+    };
+
+    const handleEdit = (id: number) => {
+        console.log('Editar time:', id);
+    };
+
+    const handleDelete = (id: number) => {
+        console.log('Deletar time:', id);
     };
 
     const toggleTheme = () => {
@@ -107,13 +115,13 @@ const DashboardTeam: React.FC<Props> = ({ title, items }) => {
                 </div>
                 <div className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
                     {filteredItems.length !== 0 ? (
-                        filteredItems.map((item, i) => (
-                            <div
-                                key={i}
-                                className={`h-[88px] w-full ${colors.buttons.secondary.base} rounded my-4 snap-center`}
-                            >
-                                {item.name}
-                            </div>
+                        filteredItems.map((team) => (
+                            <TeamListItem
+                                key={team.id}
+                                team={team}
+                                editFn={() => handleEdit(team.id)}
+                                delFn={() => handleDelete(team.id)}
+                            />
                         ))
                     ) : (
                         <div

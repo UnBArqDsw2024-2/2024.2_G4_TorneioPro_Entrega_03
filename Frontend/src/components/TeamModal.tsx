@@ -1,21 +1,38 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 
 interface FormData {
   name: string;
   sport: string;
   description: string;
-  championship: string;
-  capacity: string;
+  trainerId: string;
   allowRequests: boolean;
 }
 
+interface UserDetails {
+  id: number;
+  username: string;
+  email: string;
+  user_type: string;
+  is_approved: boolean;
+}
+
+interface Trainer {
+  id: number;
+  user: number;
+  user_details: UserDetails;
+  experience_years: number;
+  specialization: string;
+  license_number: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface TeamModalProps {
+  onSubmit: (data: FormData) => void;
   children: ReactNode;
-  onSubmit?: (data: FormData) => void;
 }
 
 const SPORTS = ['Futebol', 'Basquete', 'Vôlei', 'Tênis', 'Outros'];
-const CHAMPIONSHIPS = ['Campeonato A', 'Campeonato B', 'Campeonato C', 'Torneio Regional'];
 
 const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode; }) => {
   if (!isOpen) return null;
@@ -61,37 +78,108 @@ const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
   );
 };
 
-const TeamModal: React.FC<TeamModalProps> = ({ children, onSubmit }) => {
+const TeamModal: React.FC<TeamModalProps> = ({ onSubmit, children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     sport: '',
     description: '',
-    championship: '',
-    capacity: '',
+    trainerId: '',
     allowRequests: false
   });
+
+  useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/trainers/list/', {
+          headers: {
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MDUzMjY4LCJpYXQiOjE3MzYwNDk2NjgsImp0aSI6IjliM2Y3ODllMzQ0NDRjYjg4MDEyZTNmY2Q3NGJmNGRmIiwidXNlcl9pZCI6MX0.EqkPagY2jmxZyZTOPL7K2vJdiu0jHhzVRFdksidmd2k`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Falha ao buscar treinadores');
+        }
+        const data = await response.json();
+        setTrainers(data);
+      } catch (error) {
+        console.error('Erro ao buscar treinadores:', error);
+        // Dados mockados para teste em caso de falha na API
+        setTrainers([
+          { 
+            id: 1,
+            user: 1,
+            user_details: {
+              id: 1,
+              username: "Treinador 1",
+              email: "treinador1@exemplo.com",
+              user_type: "trainer",
+              is_approved: true
+            },
+            experience_years: 5,
+            specialization: "Futebol",
+            license_number: "TMP_1",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ]);
+      }
+    };
+
+    if (isModalOpen) {
+      fetchTrainers();
+    }
+  }, [isModalOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-    setFormData({ ...formData, [name]: newValue });
+    setFormData(prev => ({ ...prev, [name]: newValue }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit) {
+    
+    try {
+      const response = await fetch('http://localhost:8000/teams/create/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MDUzMjY4LCJpYXQiOjE3MzYwNDk2NjgsImp0aSI6IjliM2Y3ODllMzQ0NDRjYjg4MDEyZTNmY2Q3NGJmNGRmIiwidXNlcl9pZCI6MX0.EqkPagY2jmxZyZTOPL7K2vJdiu0jHhzVRFdksidmd2k`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          trainer: parseInt(formData.trainerId)
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao criar time');
+      }
+
+      const data = await response.json();
+      console.log('Time criado com sucesso:', data);
+      
+      // Chama o onSubmit com os dados retornados da API
       onSubmit(formData);
+      
+      // Limpa o formulário
+      setFormData({
+        name: '',
+        sport: '',
+        description: '',
+        trainerId: '',
+        allowRequests: false
+      });
+      
+      // Fecha o modal
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Erro ao criar time:', error);
+      alert('Erro ao criar time. Por favor, tente novamente.');
     }
-    setFormData({
-      name: '',
-      sport: '',
-      description: '',
-      championship: '',
-      capacity: '',
-      allowRequests: false
-    });
-    setIsModalOpen(false);
   };
 
   const inputClassName = "w-full bg-[#2c3e50] text-white rounded-md px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400 transition-all duration-200";
@@ -102,6 +190,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ children, onSubmit }) => {
       <div onClick={() => setIsModalOpen(true)}>
         {children}
       </div>
+
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Criar Novo Time">
         <form onSubmit={handleSubmit} className="space-y-4">
           <input 
@@ -136,25 +225,19 @@ const TeamModal: React.FC<TeamModalProps> = ({ children, onSubmit }) => {
           />
           
           <select 
-            name="championship" 
-            value={formData.championship} 
+            name="trainerId" 
+            value={formData.trainerId} 
             onChange={handleChange} 
             className={selectClassName}
             required
           >
-            <option value="">Selecione o Campeonato...</option>
-            {CHAMPIONSHIPS.map(championship => <option key={championship} value={championship}>{championship}</option>)}
+            <option value="">Selecione o Treinador...</option>
+            {trainers.map(trainer => (
+              <option key={trainer.id} value={trainer.user.toString()}>
+                {trainer.user_details.username}
+              </option>
+            ))}
           </select>
-          
-          <input 
-            type="number" 
-            name="capacity" 
-            placeholder="Capacidade do Time" 
-            value={formData.capacity} 
-            onChange={handleChange} 
-            className={inputClassName}
-            required
-          />
           
           <label className="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-gray-200 transition-colors duration-200">
             <input 

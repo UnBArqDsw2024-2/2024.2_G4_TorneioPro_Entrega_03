@@ -1,13 +1,14 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, ReactNode } from "react";
 import { TailwindThemeAdapter } from "./adpater/TailwindThemeAdapter.tsx";
 import ChampionshipModal from "./ChampionshipModal.tsx";
 
 interface Props {
     title: string;
     items: Array<any>;
+    children?: ReactNode;
 }
 
-const DashboardChapionship: React.FC<Props> = ({ title, items }) => {
+const DashboardChapionship: React.FC<Props> = ({ title, items, children }) => {
     const [filteredItems, setFilteredItems] = useState(items);
     const [theme, setTheme] = useState<"light" | "dark">("dark");
 
@@ -17,15 +18,15 @@ const DashboardChapionship: React.FC<Props> = ({ title, items }) => {
 
     const handleSearch = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const search = e.target.value;
+            const search = e.target.value.toLowerCase();
             if (search === "") {
                 setFilteredItems(items);
             } else {
                 const filtered = items.filter((item) => {
                     return (
-                        item.nome.toLowerCase().includes(search.toLowerCase()) ||
-                        item.email.toLowerCase().includes(search.toLowerCase()) ||
-                        item.matricula.toLowerCase().includes(search.toLowerCase())
+                        item.name?.toLowerCase().includes(search) ||
+                        item.description?.toLowerCase().includes(search) ||
+                        item.type?.toLowerCase().includes(search)
                     );
                 });
                 setFilteredItems(filtered);
@@ -106,26 +107,28 @@ const DashboardChapionship: React.FC<Props> = ({ title, items }) => {
                     </div>
                 </div>
                 <div className="lg:mt-4 mt-2 lg:px-4 px-3 overflow-y-auto whitespace-nowrap scroll-smooth scrollbar-thumb-navbar-secondary-btn-hover scrollbar-track-transparent scrollbar-thin snap-y snap-mandatory">
-                    {filteredItems.length !== 0 ? (
-                        filteredItems.map((item, i) => (
+                    {children ? children : (
+                        filteredItems.length !== 0 ? (
+                            filteredItems.map((item, i) => (
+                                <div
+                                    key={i}
+                                    className={`h-[88px] w-full ${colors.buttons.secondary.base} rounded my-4 snap-center`}
+                                >
+                                    {item.name}
+                                </div>
+                            ))
+                        ) : (
                             <div
-                                key={i}
-                                className={`h-[88px] w-full ${colors.buttons.secondary.base} rounded my-4 snap-center`}
+                                key={0}
+                                className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}
                             >
-                                {item.name}
+                                <div
+                                    className={`flex flex-col justify-center lg:h-[15vh] h-[15vh] ${colors.buttons.primary.hover} lg:text-3xl text-xl`}
+                                >
+                                    <p>Sem {title.toLowerCase()} no momento...</p>
+                                </div>
                             </div>
-                        ))
-                    ) : (
-                        <div
-                            key={0}
-                            className={`mt-1 flex flex-col justify-center items-center w-full justify-self-center bg-transparent rounded-[10px] border-2 ${colors.buttons.primary.base}`}
-                        >
-                            <div
-                                className={`flex flex-col justify-center lg:h-[15vh] h-[15vh] ${colors.buttons.primary.hover} lg:text-3xl text-xl`}
-                            >
-                                <p>Sem {title.toLowerCase()} no momento...</p>
-                            </div>
-                        </div>
+                        )
                     )}
                 </div>
             </div>
