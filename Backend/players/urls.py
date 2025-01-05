@@ -9,5 +9,5 @@ urlpatterns = [
     # Body-based action endpoints
     path('get/', views.PlayerViewSet.as_view({'post': 'get_player'}), name='player-get'),
     path('update/', views.PlayerViewSet.as_view({'post': 'update_player'}), name='player-update'),
-    path('delete/', views.PlayerViewSet.as_view({'post': 'delete_player'}), name='player-delete'),
+    path('delete/', views.PlayerViewSet.as_view({'delete': 'delete_player'}), name='player-delete'),
 ]

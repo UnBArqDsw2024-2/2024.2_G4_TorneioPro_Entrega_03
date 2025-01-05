@@ -5,11 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Team
 from .serializers import TeamSerializer
 from authentication.models import User
+from authentication.permissions import IsOrganizerOrTrainer
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOrganizerOrTrainer]
 
     def get_queryset(self):
         queryset = Team.objects.all()
@@ -41,7 +42,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         except Team.DoesNotExist:
             return Response({"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def delete_team(self, request):
         team_id = request.data.get('team_id')
         try:
@@ -65,7 +66,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response({"error": "Player not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def remove_player(self, request):
         team_id = request.data.get('team_id')
         player_id = request.data.get('player_id')

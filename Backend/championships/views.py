@@ -41,7 +41,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
         except Championship.DoesNotExist:
             return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def delete_championship(self, request):
         championship_id = request.data.get('championship_id')
         try:
@@ -69,7 +69,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
             )
 
         # If it's a team sport, team_id is required and trainer approval is needed
-        if championship.sport_type == 'team':
+        if championship.sport.type == 'team':
             if not team_id:
                 return Response(
                     {"error": "Team ID is required for team sports"},
@@ -149,7 +149,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
         pending_requests = ChampionshipJoinRequest.objects.filter(
             team__trainer=request.user,  # O time deve ter o usuário atual como treinador
             status='pending',  # Apenas solicitações pendentes
-            championship__sport_type='team'  # Apenas para esportes em equipe
+            championship__sport__type='team'  # Apenas para esportes em equipe
         ).select_related('championship', 'player', 'team')  # Otimiza as queries
         
         serializer = PendingJoinRequestSerializer(pending_requests, many=True)
@@ -194,7 +194,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
         except Championship.DoesNotExist:
             return Response({"error": "Championship not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def remteams(self, request):
         championship_id = request.data.get('championship_id')
         try:
@@ -252,7 +252,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
                 player=player
             )
 
-            if championship.sport_type == 'team':
+            if championship.sport.type == 'team':
                 if not team_id:
                     return Response(
                         {"error": "Team ID is required for team sports"},
@@ -269,7 +269,7 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
 
             join_request.save()  # Isso vai aprovar automaticamente se for esporte individual
 
-            message = "Request sent to team trainer for approval" if championship.sport_type == 'team' else "Player registered successfully"
+            message = "Request sent to team trainer for approval" if championship.sport.type == 'team' else "Player registered successfully"
             return Response({"message": message}, status=status.HTTP_200_OK)
 
         except Championship.DoesNotExist:

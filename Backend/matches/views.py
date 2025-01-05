@@ -33,7 +33,7 @@ class MatchViewSet(viewsets.ModelViewSet):
         except Match.DoesNotExist:
             return Response({"error": "Match not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def delete_match(self, request):
         match_id = request.data.get('match_id')
         try:

@@ -48,7 +48,7 @@ docker compose down
 ### Campeonatos
 - [Testado] `GET /championships/list` - Lista todos os campeonatos
 - [Testado] `POST /championships/create` - Cria novo campeonato
-  - Body: { "name": "string", "description": "string", "sport": number, "sport_type": "team",  // ou "individual", "championship_type": "points" // ou "bracket", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" }
+  - Body: { "name": "string", "description": "string", "sport": number, "championship_type": "points" // ou "bracket", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD", "teams": "Lista com os IDs de times a serem incluidos" }
 - [Testado] `POST /championships/get` - Obtém detalhes de um campeonato específico
   - Body: { "championship_id": number }
 - [Testado] `POST /championships/update` - Atualiza campeonato
@@ -86,8 +86,6 @@ docker compose down
 
 ### Partidas
 - [Testado] `GET /matches/list` - Lista todas as partidas
-- [Não existe mais] `POST /matches/create` - Cria nova partida
-  - Body: { "team1_id": number, "team2_id": number, "championship_id": number, "date": "YYYY-MM-DD" }
 - [Testado] `POST /matches/get` - Obtém detalhes de uma partida específica
   - Body: { "match_id": number }
 - [Não testado] `POST /matches/update` - Atualiza partida
@@ -99,8 +97,6 @@ docker compose down
 
 ### Organizadores (Descarta-se por enquanto)
 - [Não testado] `GET /organizers/list` - Lista todos os organizadores
-- [Testado] `POST /organizers/create` - Cria novo organizador
-  - Body: { "user_id": number, ...dados_do_organizador }
 - [Não testado] `POST /organizers/get` - Obtém detalhes de um organizador específico
   - Body: { "organizer_id": number }
 - [Não testado] `POST /organizers/update` - Atualiza organizador
@@ -110,9 +106,6 @@ docker compose down
 
 ### Treinadores
 - [Testado] `GET /trainers/list` - Lista todos os treinadores
-- [Testado] `POST /trainers/create` - Cria novo treinador
-  - Body: { "name": "string", "description": "string", "trainer": number
-}
 - [Testado] `POST /trainers/get` - Obtém detalhes de um treinador específico
   - Body: { "trainer_id": number }
 - [Testado] `POST /trainers/update` - Atualiza treinador
@@ -122,8 +115,6 @@ docker compose down
 
 ### Jogadores
 - [Testado] `GET /players/list` - Lista todos os jogadores
-- [Não testado] `POST /players/create` - Cria novo jogador
-  - Body: { "user_id": number, ...dados_do_jogador }
 - [Testado] `POST /players/get` - Obtém detalhes de um jogador específico
   - Body: { "player_id": number }
 - [Não testado] `POST /players/update` - Atualiza jogador
@@ -392,12 +383,11 @@ Requer Autenticação? Sim
 {
     "name": "Nome do Campeonato",
     "description": "Descrição do campeonato",
-    "sport": 1, "ID do esporte"
-    "sport_type": "team",  // ou "individual"
+    "sport": 1,  // ID do esporte
     "championship_type": "points",  // ou "bracket"
-    "start_date": "2024-01-03T12:00:00Z",
-    "end_date": "2024-02-03T12:00:00Z",
-    "teams": [1, 2, 3] "Lista de IDs dos times (opcional)"
+    "start_date": "2025-01-05T00:00:00",
+    "end_date": "2025-02-05T00:00:00",
+    "teams": []  // Lista de IDs dos times (opcional)
 }
 ```
 

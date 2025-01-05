@@ -42,7 +42,7 @@ class TrainerViewSet(viewsets.ModelViewSet):
         except TrainerProfile.DoesNotExist:
             return Response({"error": "Trainer not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def delete_trainer(self, request):
         trainer_id = request.data.get('trainer_id')
         try:

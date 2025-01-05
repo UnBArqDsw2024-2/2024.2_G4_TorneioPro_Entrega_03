@@ -9,7 +9,7 @@ urlpatterns = [
     # Body-based action endpoints
     path('get/', views.ChampionshipViewSet.as_view({'post': 'get_championship'}), name='championship-get'),
     path('update/', views.ChampionshipViewSet.as_view({'post': 'update_championship'}), name='championship-update'),
-    path('delete/', views.ChampionshipViewSet.as_view({'post': 'delete_championship'}), name='championship-delete'),
+    path('delete/', views.ChampionshipViewSet.as_view({'delete': 'delete_championship'}), name='championship-delete'),
     
     # Join request endpoints
     path('join/request/', views.ChampionshipViewSet.as_view({'post': 'join_request'}), name='championship-join-request'),
@@ -19,6 +19,6 @@ urlpatterns = [
     
     # Team management endpoints
     path('addteams/', views.ChampionshipViewSet.as_view({'post': 'addteams'}), name='championship-addteams'),
-    path('remteams/', views.ChampionshipViewSet.as_view({'post': 'remteams'}), name='championship-remteams'),
+    path('remteams/', views.ChampionshipViewSet.as_view({'delete': 'remteams'}), name='championship-remteams'),
     path('close/', views.ChampionshipViewSet.as_view({'post': 'close'}), name='championship-close'),
 ]

@@ -8,7 +8,7 @@ class ChampionshipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Championship
-        fields = ('id', 'name', 'description', 'sport', 'sport_type', 'championship_type',
+        fields = ('id', 'name', 'description', 'sport', 'championship_type',
                  'start_date', 'end_date', 'teams', 'teams_details', 
                  'is_active', 'created_at', 'updated_at')
         read_only_fields = ('created_at', 'updated_at')

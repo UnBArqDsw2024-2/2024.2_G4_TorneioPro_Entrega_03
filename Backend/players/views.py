@@ -42,7 +42,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
         except PlayerProfile.DoesNotExist:
             return Response({"error": "Player not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['delete'])
     def delete_player(self, request):
         player_id = request.data.get('player_id')
         try:
