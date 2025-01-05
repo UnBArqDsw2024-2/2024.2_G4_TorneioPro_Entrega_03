@@ -2,9 +2,23 @@ import React from 'react';
 import DashboardTeam from '../components/DashboardTeam';
 
 const Team: React.FC = () => {
-    // Exemplo de dados - você pode adaptar conforme necessário
-    const mockItems = [
-        { nome: 'Exemplo 1', email: 'exemplo1@email.com', matricula: '123456' },
+    // Dados mockados para testar o componente
+    const mockTeams = [
+        {
+            id: 1,
+            name: "Flamengo",
+            description: "Time de futebol profissional",
+        },
+        {
+            id: 2,
+            name: "Vasco",
+            description: "Time tradicional do Rio de Janeiro",
+        },
+        {
+            id: 3,
+            name: "Botafogo",
+            description: "Clube com grande história",
+        }
     ];
 
     return (
@@ -12,7 +26,7 @@ const Team: React.FC = () => {
             <div className="container mx-auto px-4">
                 <DashboardTeam 
                     title="Time"
-                    items={mockItems}
+                    items={mockTeams}
                 />
             </div>
         </div>
