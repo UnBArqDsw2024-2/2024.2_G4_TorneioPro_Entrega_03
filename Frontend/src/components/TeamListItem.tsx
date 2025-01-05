@@ -17,13 +17,6 @@ const TeamListItem: React.FC<TeamListItemProps> = ({team, delFn, editFn}) => {
             <div
                 className="flex flex-row justify-between items-middle">
                 <div className="flex flex-row w-[30vw] gap-x-3">
-                    <div className="avatar w-[4vw]">
-                        <div className="ring-sidebar-body-bg w-14 rounded-full ring">
-                            <img
-                                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                alt="Imagem do Usuário"/>
-                        </div>
-                    </div>
                     <div className="flex flex-col">
                         <p className="text-lg truncate">{team.name}</p>
                     </div>
