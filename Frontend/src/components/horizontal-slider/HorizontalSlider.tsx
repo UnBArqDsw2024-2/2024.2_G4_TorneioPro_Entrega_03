@@ -21,7 +21,7 @@ interface Props {
         name: string;
         description: string;
         championship_type: string;
-        type: string;
+        sport_type: string;
         start_date: string;
         end_date: string;
         teams?: any[];

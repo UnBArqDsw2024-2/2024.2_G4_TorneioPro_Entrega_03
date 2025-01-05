@@ -4,6 +4,7 @@ import ReactViteBase from "./components/ReactViteBase.tsx";
 import NavBar from "./components/NavBar.tsx";
 import Championship from './pages/Championship.tsx';
 import Team from './pages/Team.tsx';
+import Home from './pages/Home.tsx';
 
 function App() {
     return (
@@ -11,7 +12,7 @@ function App() {
             <BrowserRouter>
                 <NavBar />
                 <Routes>
-                    <Route path='/' element={<ReactViteBase />}/>
+                    <Route path='/' element={<Home />}/>
                     <Route path='/dashboard' element={<Championship />}/>
                     <Route path='/time' element={<Team />}/>
                 </Routes>
