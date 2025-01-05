@@ -1,5 +1,45 @@
 import React, { useState, ReactNode } from 'react';
 
+// Strategy Interface
+interface ChampionshipStrategy {
+  validateForm: (data: FormData) => boolean;
+  prepareSubmission: (data: FormData) => FormData;
+}
+
+// Concrete Strategies
+const AmateurChampionshipStrategy: ChampionshipStrategy = {
+  validateForm: (data: FormData) => {
+    // Amateur championships have simpler validation
+    return data.name.length >= 3 && !!data.sport && !!data.startDate;
+  },
+  prepareSubmission: (data: FormData) => ({
+    ...data,
+    category: 'Amador',
+    // Add default values specific to amateur championships
+    description: data.description || 'Campeonato Amador',
+  })
+};
+
+const ProfessionalChampionshipStrategy: ChampionshipStrategy = {
+  validateForm: (data: FormData) => {
+    // Professional championships need more strict validation
+    return (
+      data.name.length >= 5 &&
+      !!data.sport &&
+      !!data.description &&
+      !!data.startDate &&
+      !!data.endDate &&
+      new Date(data.startDate) < new Date(data.endDate)
+    );
+  },
+  prepareSubmission: (data: FormData) => ({
+    ...data,
+    category: 'Profissional',
+    // Add any professional-specific data transformations
+    description: `Campeonato Profissional: ${data.description}`,
+  })
+};
+
 interface FormData {
   name: string;
   sport: string;
@@ -71,24 +111,43 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
     endDate: '',
     category: '',
   });
+  
+  // Strategy selection based on category
+  const [currentStrategy, setCurrentStrategy] = useState<ChampionshipStrategy>(AmateurChampionshipStrategy);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    // Update strategy when category changes
+    if (name === 'category') {
+      setCurrentStrategy(
+        value === 'Profissional' 
+          ? ProfessionalChampionshipStrategy 
+          : AmateurChampionshipStrategy
+      );
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      name: '',
-      sport: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      category: '',
-    });
-    setIsModalOpen(false);
+    
+    // Use strategy to validate and prepare data
+    if (currentStrategy.validateForm(formData)) {
+      const preparedData = currentStrategy.prepareSubmission(formData);
+      onSubmit(preparedData);
+      setFormData({
+        name: '',
+        sport: '',
+        description: '',
+        startDate: '',
+        endDate: '',
+        category: '',
+      });
+      setIsModalOpen(false);
+    } else {
+      alert('Por favor, preencha todos os campos corretamente.');
+    }
   };
 
   const inputClassName = "w-full bg-[#2c3e50] text-white rounded-md px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400 transition-all duration-200";
@@ -129,7 +188,7 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
             onChange={handleChange} 
             rows={4} 
             className={`${inputClassName} resize-none`}
-            required
+            required={formData.category === 'Profissional'}
           />
           
           <div className="grid grid-cols-2 gap-3">
@@ -152,7 +211,7 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ children, onSubmi
                 value={formData.endDate} 
                 onChange={handleChange} 
                 className={inputClassName}
-                required
+                required={formData.category === 'Profissional'}
               />
             </div>
           </div>
