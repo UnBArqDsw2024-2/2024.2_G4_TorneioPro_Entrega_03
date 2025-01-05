@@ -1029,3 +1029,229 @@ class ChampionshipStandingsTests(APITestCase):
         self.assertEqual(len(response.data), 3)
         self.assertEqual(response.data[0]['team_name'], 'Team 1')
         self.assertEqual(response.data[0]['points'], 6)
+
+class ChampionshipFacadeTests(TestCase):
+    def setUp(self):
+        self.sport = Sport.objects.create(name="Football")
+        self.start_date = timezone.now()
+        self.end_date = self.start_date + timedelta(days=30)
+        
+        # Criar usuário treinador para os times
+        self.trainer = User.objects.create_user(
+            username='trainer',
+            password='12345',
+            email='trainer@test.com',
+            user_type='trainer'
+        )
+        
+        # Criar campeonato para testes
+        self.championship = Championship.objects.create(
+            name="Test Championship",
+            description="Test Description",
+            sport=self.sport,
+            championship_type='bracket',
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+        
+        # Criar times para testes
+        self.teams = []
+        for i in range(3):  # Criar 3 times
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            # Adicionar 15 jogadores ao time (mais que o mínimo necessário)
+            for j in range(15):
+                player = User.objects.create_user(
+                    username=f'player{i}{j}',
+                    password='12345',
+                    email=f'player{i}{j}@test.com'
+                )
+                team.players.add(player)
+            self.teams.append(team)
+            
+        # Time com poucos jogadores
+        self.small_team = Team.objects.create(
+            name="Small Team",
+            trainer=self.trainer
+        )
+        # Adicionar apenas 5 jogadores (menos que o mínimo)
+        for j in range(5):
+            player = User.objects.create_user(
+                username=f'smallplayer{j}',
+                password='12345',
+                email=f'smallplayer{j}@test.com'
+            )
+            self.small_team.players.add(player)
+
+    def test_add_teams_success(self):
+        """Testa adição bem-sucedida de times"""
+        from .facade import ChampionshipFacade
+        
+        facade = ChampionshipFacade(self.championship)
+        success, invalid_teams = facade.add_teams(self.teams)
+        
+        self.assertTrue(success)
+        self.assertIsNone(invalid_teams)
+        self.assertEqual(self.championship.teams.count(), 3)
+
+    def test_add_teams_with_insufficient_players(self):
+        """Testa tentativa de adicionar time com jogadores insuficientes"""
+        from .facade import ChampionshipFacade
+        
+        facade = ChampionshipFacade(self.championship)
+        success, invalid_teams = facade.add_teams([self.small_team])
+        
+        self.assertFalse(success)
+        self.assertEqual(len(invalid_teams), 1)
+        self.assertEqual(invalid_teams[0]['name'], "Small Team")
+        self.assertEqual(invalid_teams[0]['current_players'], 5)
+        self.assertEqual(invalid_teams[0]['required_players'], 11)
+
+    def test_add_teams_generates_matches_for_bracket(self):
+        """Testa se as partidas são geradas quando atingir 16 times no formato bracket"""
+        from .facade import ChampionshipFacade
+        
+        # Criar mais 13 times com jogadores suficientes para completar 16
+        additional_teams = []
+        for i in range(13):
+            team = Team.objects.create(
+                name=f"Extra Team {i}",
+                trainer=self.trainer
+            )
+            for j in range(15):
+                player = User.objects.create_user(
+                    username=f'extraplayer{i}{j}',
+                    password='12345',
+                    email=f'extraplayer{i}{j}@test.com'
+                )
+                team.players.add(player)
+            additional_teams.append(team)
+        
+        facade = ChampionshipFacade(self.championship)
+        
+        # Primeiro adiciona os 3 times iniciais
+        facade.add_teams(self.teams)
+        self.assertEqual(Match.objects.filter(championship=self.championship).count(), 0)
+        
+        # Depois adiciona os 13 times restantes para completar 16
+        success, _ = facade.add_teams(additional_teams)
+        
+        self.assertTrue(success)
+        self.assertEqual(self.championship.teams.count(), 16)
+        # Deve gerar 15 partidas no formato bracket (8 oitavas + 4 quartas + 2 semi + 1 final)
+        self.assertEqual(Match.objects.filter(championship=self.championship).count(), 15)
+
+class ChampionshipFacadeTests(TestCase):
+    def setUp(self):
+        self.sport = Sport.objects.create(name="Football")
+        self.start_date = timezone.now()
+        self.end_date = self.start_date + timedelta(days=30)
+        
+        # Criar usuário treinador para os times
+        self.trainer = User.objects.create_user(
+            username='trainer',
+            password='12345',
+            email='trainer@test.com',
+            user_type='trainer'
+        )
+        
+        # Criar campeonato para testes
+        self.championship = Championship.objects.create(
+            name="Test Championship",
+            description="Test Description",
+            sport=self.sport,
+            championship_type='bracket',
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+        
+        # Criar times para testes
+        self.teams = []
+        for i in range(3):  # Criar 3 times
+            team = Team.objects.create(
+                name=f"Team {i}",
+                trainer=self.trainer
+            )
+            # Adicionar 15 jogadores ao time (mais que o mínimo necessário)
+            for j in range(15):
+                player = User.objects.create_user(
+                    username=f'player{i}{j}',
+                    password='12345',
+                    email=f'player{i}{j}@test.com'
+                )
+                team.players.add(player)
+            self.teams.append(team)
+            
+        # Time com poucos jogadores
+        self.small_team = Team.objects.create(
+            name="Small Team",
+            trainer=self.trainer
+        )
+        # Adicionar apenas 5 jogadores (menos que o mínimo)
+        for j in range(5):
+            player = User.objects.create_user(
+                username=f'smallplayer{j}',
+                password='12345',
+                email=f'smallplayer{j}@test.com'
+            )
+            self.small_team.players.add(player)
+
+    def test_add_teams_success(self):
+        """Testa adição bem-sucedida de times"""
+        from .facade import ChampionshipFacade
+        
+        facade = ChampionshipFacade(self.championship)
+        success, invalid_teams = facade.add_teams(self.teams)
+        
+        self.assertTrue(success)
+        self.assertIsNone(invalid_teams)
+        self.assertEqual(self.championship.teams.count(), 3)
+
+    def test_add_teams_with_insufficient_players(self):
+        """Testa tentativa de adicionar time com jogadores insuficientes"""
+        from .facade import ChampionshipFacade
+        
+        facade = ChampionshipFacade(self.championship)
+        success, invalid_teams = facade.add_teams([self.small_team])
+        
+        self.assertFalse(success)
+        self.assertEqual(len(invalid_teams), 1)
+        self.assertEqual(invalid_teams[0]['name'], "Small Team")
+        self.assertEqual(invalid_teams[0]['current_players'], 5)
+        self.assertEqual(invalid_teams[0]['required_players'], 11)
+
+    def test_add_teams_generates_matches_for_bracket(self):
+        """Testa se as partidas são geradas quando atingir 16 times no formato bracket"""
+        from .facade import ChampionshipFacade
+        
+        # Criar mais 13 times com jogadores suficientes para completar 16
+        additional_teams = []
+        for i in range(13):
+            team = Team.objects.create(
+                name=f"Extra Team {i}",
+                trainer=self.trainer
+            )
+            for j in range(15):
+                player = User.objects.create_user(
+                    username=f'extraplayer_team{i}_player{j}',
+                    password='12345',
+                    email=f'extraplayer_team{i}_player{j}@test.com'
+                )
+                team.players.add(player)
+            additional_teams.append(team)
+        
+        facade = ChampionshipFacade(self.championship)
+        
+        # Primeiro adiciona os 3 times iniciais
+        facade.add_teams(self.teams)
+        self.assertEqual(Match.objects.filter(championship=self.championship).count(), 0)
+        
+        # Depois adiciona os 13 times restantes para completar 16
+        success, _ = facade.add_teams(additional_teams)
+        
+        self.assertTrue(success)
+        self.assertEqual(self.championship.teams.count(), 16)
+        # Deve gerar 15 partidas no formato bracket (8 oitavas + 4 quartas + 2 semi + 1 final)
+        self.assertEqual(Match.objects.filter(championship=self.championship).count(), 15)

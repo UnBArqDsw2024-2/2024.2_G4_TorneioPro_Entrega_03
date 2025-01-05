@@ -12,6 +12,7 @@ from authentication.permissions import IsOrganizer
 from django.utils import timezone
 from .factories import get_championship_factory
 from django.core.exceptions import ValidationError
+from .facade import ChampionshipFacade
 
 class ChampionshipViewSet(viewsets.ModelViewSet):
     queryset = Championship.objects.all()
@@ -204,32 +205,14 @@ class ChampionshipViewSet(viewsets.ModelViewSet):
             team_ids = request.data.get('team_ids', [])
             teams = Team.objects.filter(id__in=team_ids)
             
-            # Verifica se cada time tem jogadores suficientes
-            min_players = 11  # Número mínimo de jogadores para um time
-            invalid_teams = []
-            for team in teams:
-                player_count = team.players.count()
-                if player_count < min_players:
-                    invalid_teams.append({
-                        'team_id': team.id,
-                        'name': team.name,
-                        'current_players': player_count,
-                        'required_players': min_players
-                    })
+            facade = ChampionshipFacade(championship)
+            success, invalid_teams = facade.add_teams(teams)
             
-            if invalid_teams:
+            if not success:
                 return Response({
                     "error": "Some teams don't have enough players",
                     "invalid_teams": invalid_teams
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-            championship.teams.add(*teams)
-            
-            # Gerar partidas após adicionar os times
-            team_count = championship.teams.count()
-            if (championship.championship_type == 'bracket' and team_count == 16) or \
-               (championship.championship_type == 'points' and 10 <= team_count <= 20):
-                championship.generate_matches()
             
             return Response({"message": "Teams added successfully"})
         except Championship.DoesNotExist:
