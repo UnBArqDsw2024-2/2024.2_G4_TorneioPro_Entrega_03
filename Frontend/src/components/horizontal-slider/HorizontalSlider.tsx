@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import CardFactory from "../factories/HorizontalSliderCardFactory";
+import {TailwindThemeAdapter} from "../adpater/TailwindThemeAdapter.tsx";
 
 export enum SliderColors {
     light,
@@ -40,10 +41,7 @@ interface Props {
     })[]
 }
 
-const HorizontalSlider: React.FC<Props> = ({ color, title, championships, strategy }) => {
-    let sliderBackgroundColor = (color == 0) ? "bg-slider-active" : "bg-slider-future";
-    let sliderSearchColor = (color == 0) ? "bg-slider-active-search" : "bg-slider-future-search";
-
+const HorizontalSlider: React.FC<Props> = ({color, title, championships, strategy}) => {
     const uniqueSports = Array.from(new Set(championships.map((item: any) => item.type)));
 
     const [selected, setSelected] = useState("");
@@ -62,6 +60,11 @@ const HorizontalSlider: React.FC<Props> = ({ color, title, championships, strate
             setFilteredChampionships(filtered);
         }
     }
+    
+    const tema = TailwindThemeAdapter.getColors();
+
+    let sliderBackgroundColor = (color == 0) ? tema.slider.active : tema.slider.future;
+    let sliderSearchColor = (color == 0) ? tema.slider.activeSearch : tema.slider.futureSearch;
 
     return (
         <div className="flex flex-col justify-center items-center w-full">
@@ -69,7 +72,7 @@ const HorizontalSlider: React.FC<Props> = ({ color, title, championships, strate
                 className={`flex flex-row justify-end items-center ${sliderBackgroundColor} lg:h-[50px] h-[45px] w-full relative`}>
                 <p className="text-primary-text lg:text-2xl text-lg absolute lg:inset-0 left-0 lg:ml-auto ml-2 lg:flex lg:justify-center lg:items-center">{title}</p>
                 <select value={selected} onChange={handleSelected}
-                    className={`select lg:w-[14%] w-[38%] lg:h-[35px] h-[30px] lg:text-sm text-xs min-h-0 focus:outline-none border-0 ${sliderSearchColor} rounded absolute right-0 lg:pl-4 pl-2 lg:mr-2.5 mr-1.5`}>
+                        className={`select lg:w-[14%] w-[38%] lg:h-[35px] h-[30px] lg:text-sm text-xs min-h-0 focus:outline-none border-0 ${sliderSearchColor} rounded absolute right-0 lg:pl-4 pl-2 lg:mr-2.5 mr-1.5`}>
                     <option value={""} className="text-formPlaceholderText">Todos Esportes</option>
                     {uniqueSports.length > 0 ? (
                         uniqueSports.map((item: any, index: number) => {
@@ -91,7 +94,8 @@ const HorizontalSlider: React.FC<Props> = ({ color, title, championships, strate
                 }) : (
                     <li key={0}
                         className="mt-1 flex flex-col justify-center items-center w-[95vw] justify-self-center bg-transparent rounded-[10px] border-2 border-primary-btn-base">
-                        <div className="flex flex-col justify-center lg:h-[30vh] h-[25vh] text-primary-btn-hover lg:text-3xl text-xl">
+                        <div
+                            className="flex flex-col justify-center lg:h-[30vh] h-[25vh] text-primary-btn-hover lg:text-3xl text-xl">
                             <p>Nenhum campeonato no momento...</p>
                         </div>
                     </li>

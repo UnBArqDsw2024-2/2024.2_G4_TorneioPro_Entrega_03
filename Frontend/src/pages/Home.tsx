@@ -1,38 +1,48 @@
-import {useAuth} from "../context/AuthContext.tsx";
-import {useNavigate} from "react-router-dom";
-import {useState} from "react";
-import DashboardBody from "./DashboardBody.tsx";
-import HorizontalSlider, {SliderColors, SliderStrategy} from "./horizontal-slider/HorizontalSlider.tsx";
+import HorizontalSlider, {SliderColors, SliderStrategy} from '../components/horizontal-slider/HorizontalSlider';
+// import {useEffect, useState} from 'react';
+// import axios from 'axios';
+// import {API_BASE_URL} from '../util/Constants';
+// import {useAuth} from '../context/AuthContext';
 
-function ReactViteBase() {
-    const {login, logout} = useAuth();
-    const navigate = useNavigate();
+const Home = () => {
+    // const {user} = useAuth()
+    //
+    // const [championshipsIndividual, setChampionshipsIndividual] = useState([])
+    // const [championshipsFuture, setChampionshipsFuture] = useState([])
 
-    const [user, setUser] = useState("");
-    const [password, setPassword] = useState("");
-
-    const [message, setMessage] = useState("");
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    }
-    const handleLogin = async () => {
-        const response = await login(user, password);
-
-        if (!response.success) setMessage(response.message);
-        else navigate("/dashboard");
-    }
-
-    const handleLoginPeba = async () => {
-        const response = await login(user, password);
-
-        if (!response.success) setMessage(response.message);
-        else navigate("/dashboard");
-    }
+    // useEffect(() => {
+    //     axios.get(`${API_BASE_URL}/championships/list/`, {
+    //         headers: {
+    //             Authorization: `Bearer ${user?.token}`
+    //         }
+    //     }).then((response): void => {
+    //         console.log(response.data)
+    //         setChampionships(response.data);
+    //     });
+    // }, [user?.token])
+    //
+    // useEffect(() => {
+    //     axios.get(`${API_BASE_URL}/championships/list/`, {
+    //         headers: {
+    //             Authorization: `Bearer ${user?.token}`
+    //         }
+    //     }).then((response): void => {
+    //         setChampionshipsIndividual(response.data);
+    //     });
+    // }, [user?.token])
+    //
+    // useEffect(() => {
+    //     axios.get(`${API_BASE_URL}/championships/list/`, {
+    //         headers: {
+    //             Authorization: `Bearer ${user?.token}`
+    //         }
+    //     }).then((response): void => {
+    //         setChampionshipsFuture(response.data);
+    //     });
+    // }, [user?.token])
 
     // TODO só para testar
-    const championships = [
+    const mock_championships = [
         {
             id: 1,
             name: "Campeonato Tal de Tal",
@@ -216,102 +226,27 @@ function ReactViteBase() {
     ];
 
     return (
-        <div className="">
-            <DashboardBody
-                title={"CAMPEONATOS"}
-                items={championships}
-            />
-
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 mt-32 mb-10 flex flex-col gap-y-10">
             <HorizontalSlider
-                title={"Campeonatos Individuais"}
-                championships={championships}
-                color={SliderColors.dark}
-                strategy={SliderStrategy.future}
-            />
-
-            <HorizontalSlider
-                title={"Campeonatos Individuais"}
-                championships={championships}
+                title={"Campeonatos em Equipe"}
+                championships={mock_championships}
                 color={SliderColors.light}
                 strategy={SliderStrategy.default}
             />
-
             <HorizontalSlider
-                title={"Campeonatos Brackets"}
-                championships={championships}
+                title={"Campeonatos Individuais"}
+                championships={mock_championships}
                 color={SliderColors.light}
                 strategy={SliderStrategy.bracket}
             />
-
-            <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
-                <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
-                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), e utilizando o
-                    Backend.
-                </p>
-
-                <label className="input input-bordered flex items-center gap-2">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="h-4 w-4 opacity-70">
-                        <path
-                            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z"/>
-                    </svg>
-                    <input type="text" className="grow" placeholder="Usuário" value={user}
-                           onChange={e => setUser(e.target.value)}/>
-                </label>
-
-                <label className="input input-bordered flex items-center gap-2">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="h-4 w-4 opacity-70">
-                        <path
-                            fillRule="evenodd"
-                            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-                            clipRule="evenodd"/>
-                    </svg>
-                    <input type="password" className="grow" placeholder="Senha" value={password}
-                           onChange={e => setPassword(e.target.value)}/>
-                </label>
-
-                <button
-                    onClick={() => handleLogin()}
-                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
-                    Login
-                </button>
-
-                <p className="text-lg text-secondary">{message}</p>
-
-                <button
-                    onClick={() => handleLogout()}
-                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
-                    Logout
-                </button>
-            </div>
-
-            <div className="flex flex-col justify-center items-center mt-20 gap-y-8 mx-5">
-                <p className="lg:text-3xl text-base text-primary-text-detail text-justify hyphens-auto"
-                   lang="pt-BR">Login Funcional utilizando AuthContext (salvando no LocalStorage), sem utilizar o
-                    Backend.
-                </p>
-
-                <button
-                    onClick={() => handleLoginPeba()}
-                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-active-btn-base hover:bg-sidebar-active-btn-hover text-primary-text-detail rounded">
-                    Simular Login
-                </button>
-
-                <button
-                    onClick={() => handleLogout()}
-                    className="lg:w-1/6 w-3/4 lg:h-[60px] h-[50px] lg:text-2xl text-lg bg-sidebar-base-btn-base hover:bg-sidebar-base-btn-hover text-primary-text-detail rounded ">
-                    Simular Logout
-                </button>
-            </div>
+            <HorizontalSlider
+                title={"Campeonatos Futuros"}
+                championships={mock_championships}
+                color={SliderColors.dark}
+                strategy={SliderStrategy.future}
+            />
         </div>
-    )
-}
+    );
+};
 
-export default ReactViteBase
+export default Home;

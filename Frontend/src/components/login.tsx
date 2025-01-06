@@ -1,15 +1,13 @@
-
 import {useState} from "react";
 import {useAuth} from "../context/AuthContext.tsx";
-import {useNavigate} from "react-router-dom"; 
+import {useNavigate} from "react-router-dom";
 // Componente Quadrado
 const Login = () => {
     const estiloRegistro = {
         width: '500px',
         height: '1000px',
         backgroundColor: '#313F54',
-        margin: '10px',
-
+        margin: '0px',
 
 
     };
@@ -51,13 +49,11 @@ const Login = () => {
         height: '60px',
 
 
-
     };
     // const estiloInputTexto = {
 
 
     //     height: '160px',
-
 
 
     // };
@@ -69,65 +65,77 @@ const Login = () => {
         alignItems: 'center',
 
 
-
-
     };
 
-    const {login, logout} = useAuth();
+    const {login} = useAuth();
     const navigate = useNavigate();
-    
+
     const [user, setUser] = useState("");
     const [password, setPassword] = useState("");
-    
+
     const [message, setMessage] = useState("");
-    
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
+
+    const handleRegister = () => {
+        navigate("/register");
     }
-    const handleLogin = async () => {
-        const response = await login(user, password);
+    const handleLogin = async (e) => {
+        e.preventDefault();
         
-        if(!response.success) setMessage(response.message);
+        const response = await login(user, password);
+
+        if (!response.success) setMessage(response.message);
         else navigate("/dashboard");
     }
 
 
     return <div style={estiloRegistro}>
         <div style={estiloTitulo}><h1>LOGIN</h1></div>
-        <div style={estiloCampos}><input
-            type="Email"
-            placeholder="Email"
-            value={user}
-                           onChange={e => setUser(e.target.value)}
-            style={{ ...estiloInput, ...estiloInputEmail }}
+
+        <form onSubmit={handleLogin}>
+            <div style={estiloCampos}><input
+                type="text"
+                placeholder="Nome de Usuário"
+                required={true}
+                className="bg-form-modal-input"
+                value={user}
+                onChange={e => setUser(e.target.value)}
+                style={{...estiloInput, ...estiloInputEmail}}
 
 
-        /> </div>
-        <div style={estiloCampos}><input
-            type="Password"
-            placeholder="Senha"
-            value={password}
-                           onChange={e => setPassword(e.target.value)}
-            style={{ ...estiloInput, ...estiloInputEmail }}
+            /></div>
+            <div style={estiloCampos}><input
+                type="Password"
+                placeholder="Senha"
+                required={true}
+                minLength={8}
+                className="bg-form-modal-input mb-2"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                style={{...estiloInput, ...estiloInputEmail}}
 
 
-        />
-        </div>
-        
-        <div style={{ paddingLeft: '50px' }}><a href="#">Esqueceu a senha?</a></div>
+            />
+            </div>
+
+            <div style={{paddingLeft: '50px'}}><a href="#">Esqueceu a senha?</a></div>
 
 
-
-
-        <div style={{ ...estiloRegistrar, paddingTop: '50px' }} ><button onClick={() => handleLogin()} type="submit" style={{ ...estiloInput, backgroundColor: '#2C9F4C', ...estiloInputEmail, }}>ENTRAR</button>
-        </div>
-        <p className="text-lg text-secondary">{message}</p>
-        <div style={{ ...estiloRegistrar }} ><button  onClick={() => handleLogout()} type="submit" style={{ ...estiloInput, backgroundColor: '#445774', ...estiloInputEmail }}>REGISTRAR-SE</button>
-        </div>
+            <div className="flex flex-col" style={{...estiloRegistrar, paddingTop: '50px'}}>
+                <button type="submit"
+                        style={{...estiloInput, backgroundColor: '#2C9F4C', ...estiloInputEmail,}}
+                        className="hover:bg-secondary-btn-hover bg-secondary-btn-base">ENTRAR
+                </button>
+                <p className="text-lg text-secondary mt-1">{message}</p>
+            </div>
+            <div style={{...estiloRegistrar}}>
+                <button onClick={() => handleRegister()}
+                        style={{...estiloInput, backgroundColor: '#445774', ...estiloInputEmail}}
+                        className="hover:bg-primary-btn-hover bg-primary-btn-base">REGISTRAR-SE
+                </button>
+            </div>
+        </form>
 
     </div>;
 }
 
-export default Login;
-
+export default Login

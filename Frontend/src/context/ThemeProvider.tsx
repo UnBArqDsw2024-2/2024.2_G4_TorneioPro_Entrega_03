@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import { TailwindThemeAdapter } from "../components/adpater/TailwindThemeAdapter.tsx";
+import React, {createContext, useContext, useState} from "react";
+import {TailwindThemeAdapter} from "../components/adpater/TailwindThemeAdapter.tsx";
 
 interface ThemeContextType {
     theme: "light" | "dark";
@@ -8,7 +8,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [theme, setThemeState] = useState<"light" | "dark">("dark");
 
     const setTheme = (newTheme: "light" | "dark") => {
@@ -16,9 +16,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         TailwindThemeAdapter.setTheme(newTheme);
         document.documentElement.classList.toggle("dark", newTheme === "dark");
     };
-
+    
     return (
-        <ThemeContext.Provider value={{ theme, setTheme }}>
+        <ThemeContext.Provider value={{theme, setTheme}}>
             {children}
         </ThemeContext.Provider>
     );

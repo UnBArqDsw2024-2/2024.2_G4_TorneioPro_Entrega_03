@@ -1,5 +1,5 @@
-import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { API_BASE_URL } from "../util/Constants.tsx";
+import {createContext, useState, useEffect, useContext, ReactNode} from "react";
+import {API_BASE_URL} from "../util/Constants.tsx";
 import axios from "axios";
 
 interface User {
@@ -25,7 +25,7 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({children}: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -58,9 +58,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setUser(userData);
             localStorage.setItem("authUser", JSON.stringify(userData));
 
-            return { success: true, message: "Login realizado com sucesso!" };
+            return {success: true, message: "Login realizado com sucesso!"};
         } catch (erro) {
-            return { success: false, message: "Credenciais inválidas" };
+            return {success: false, message: "Credenciais inválidas"};
         }
     };
 

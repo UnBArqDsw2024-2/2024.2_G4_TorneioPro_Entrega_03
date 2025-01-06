@@ -19,7 +19,7 @@ interface ChampionshipListItemProps {
 const ChampionshipListItem: React.FC<ChampionshipListItemProps> = ({championship, delFn, editFn}) => {
     const startDateConverted = DateConverter(championship.start_date, true);
     const endDateConverted = DateConverter(championship.end_date, true);
-    
+
     return (
         <div key={championship.id} className="p-4 m-2 rounded-lg bg-list-item-bg">
             <div

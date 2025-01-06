@@ -11,13 +11,13 @@ type ButtonProps = {
 };
 
 const ButtonFactory: React.FC<ButtonProps> = ({
-    type,
-    label,
-    icon,
-    onClick,
-    isActive = false,
-    isDisabled = false,
-}) => {
+                                                  type,
+                                                  label,
+                                                  icon,
+                                                  onClick,
+                                                  isActive = false,
+                                                  isDisabled = false,
+                                              }) => {
     const baseClass =
         type === "sidebar"
             ? "w-full h-[60px] text-lg flex items-center pl-3 rounded"
@@ -37,7 +37,7 @@ const ButtonFactory: React.FC<ButtonProps> = ({
         <button
             onClick={onClick}
             className={`${baseClass} ${isActive ? activeClass : inactiveClass
-                } hover:opacity-80 disabled:opacity-50`}
+            } hover:opacity-80 disabled:opacity-50`}
             disabled={isDisabled}
         >
             {icon && <span className="mr-2">{icon}</span>}
