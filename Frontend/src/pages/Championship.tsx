@@ -1,56 +1,109 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardChapionship from '../components/DashboardChapionship';
 import ChampionshipListItem from '../components/ChampionshipListItem';
+import { useAuth } from '../context/AuthContext';
+
+interface APIChampionship {
+    id: number;
+    name: string;
+    description: string;
+    sport: number;
+    start_date: string;
+    end_date: string;
+    teams: number[];
+}
+
+interface UIChampionship {
+    id: number;
+    name: string;
+    description: string;
+    type: string;
+    championship_type: string;
+    start_date: string;
+    end_date: string;
+}
 
 const Championship: React.FC = () => {
-    // Dados mockados para testar o componente
-    const mockChampionships = [
-        {
-            id: 1,
-            name: "Campeonato de Futebol 2024",
-            description: "Campeonato anual de futebol com times da região",
-            type: "Eliminatórias",
-            championship_type: "Profissional",
-            start_date: "2024-03-01",
-            end_date: "2024-11-30"
-        },
-        {
-            id: 2,
-            name: "Copa Vôlei Master",
-            description: "Torneio de vôlei para atletas master",
-            type: "Pontos Corridos",
-            championship_type: "Master",
-            start_date: "2024-04-15",
-            end_date: "2024-08-20"
-        },
-        {
-            id: 3,
-            name: "Torneio de Basquete Juvenil",
-            description: "Competição para jovens talentos do basquete",
-            type: "Mata-mata",
-            championship_type: "Juvenil",
-            start_date: "2024-05-10",
-            end_date: "2024-07-15"
-        }
-    ];
+    const { user } = useAuth();
+    const [championships, setChampionships] = useState<UIChampionship[]>([]);
 
-    const handleEdit = (id: number) => {
+    const fetchChampionships = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/championships/list/', {
+                headers: {
+                    'Authorization': `Bearer ${user?.token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Falha ao buscar campeonatos');
+            }
+            const data: APIChampionship[] = await response.json();
+            
+            // Mapeia os dados da API para o formato esperado pela UI
+            const uiData: UIChampionship[] = data.map(championship => ({
+                id: championship.id,
+                name: championship.name,
+                description: championship.description,
+                type: 'Eliminatórias', // Valor padrão, ajuste conforme necessário
+                championship_type: 'Profissional', // Valor padrão, ajuste conforme necessário
+                start_date: championship.start_date,
+                end_date: championship.end_date
+            }));
+            
+            setChampionships(uiData);
+        } catch (error) {
+            console.error('Erro ao buscar campeonatos:', error);
+            setChampionships([]);
+        }
+    };
+
+    useEffect(() => {
+        if (user?.token) {
+            fetchChampionships();
+        }
+    }, [user?.token]);
+
+    const handleEdit = async (id: number) => {
+        // Por enquanto apenas log, a edição será implementada no modal
         console.log('Editar campeonato:', id);
     };
 
-    const handleDelete = (id: number) => {
-        console.log('Deletar campeonato:', id);
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('Tem certeza que deseja deletar este campeonato?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8000/championships/delete/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${user?.token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Falha ao deletar campeonato');
+            }
+
+            // Atualiza a lista após deletar
+            await fetchChampionships();
+        } catch (error) {
+            console.error('Erro ao deletar campeonato:', error);
+            alert('Erro ao deletar campeonato. Por favor, tente novamente.');
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <div className="container mx-auto px-4">
-                <DashboardChapionship
-                    title="CAMPEONATOS"
-                    items={mockChampionships}
+                <DashboardChapionship 
+                    title="Campeonato"
+                    items={championships}
                 >
                     <div className="space-y-4 mt-4">
-                        {mockChampionships.map((championship) => (
+                        {championships.map((championship) => (
                             <ChampionshipListItem
                                 key={championship.id}
                                 championship={championship}
