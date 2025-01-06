@@ -1,4 +1,97 @@
 import React, { useState, ReactNode, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+
+// Strategy Interface
+interface ChampionshipStrategy {
+  validateForm: (data: FormData) => { isValid: boolean; errors?: string[] };
+  prepareSubmission: (data: FormData, teams: Team[]) => any;
+}
+
+// Simple Strategy - Basic Validation
+const SimpleChampionshipStrategy: ChampionshipStrategy = {
+  validateForm: (data: FormData) => {
+    const errors: string[] = [];
+    
+    if (!data.name || data.name.length < 3) {
+      errors.push('Nome deve ter pelo menos 3 caracteres');
+    }
+    if (!data.sport) {
+      errors.push('Selecione um esporte');
+    }
+    if (!data.start_date) {
+      errors.push('Data de início é obrigatória');
+    }
+    if (!data.teams || data.teams.length === 0) {
+      errors.push('Selecione pelo menos um time');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  },
+  prepareSubmission: (data: FormData, teams: Team[]) => {
+    const selectedTeamIds = data.teams.map(teamName => {
+      const team = teams.find(t => t.name === teamName);
+      return team ? team.id : null;
+    }).filter(id => id !== null);
+
+    return {
+      name: data.name,
+      description: data.description || 'Campeonato',
+      sport: parseInt(data.sport),
+      start_date: data.start_date,
+      end_date: data.end_date || data.start_date, // Use start_date as end_date if not provided
+      teams: selectedTeamIds
+    };
+  }
+};
+
+// Advanced Strategy - Strict Validation
+const AdvancedChampionshipStrategy: ChampionshipStrategy = {
+  validateForm: (data: FormData) => {
+    const errors: string[] = [];
+    
+    if (!data.name || data.name.length < 5) {
+      errors.push('Nome deve ter pelo menos 5 caracteres');
+    }
+    if (!data.description || data.description.length < 10) {
+      errors.push('Descrição deve ter pelo menos 10 caracteres');
+    }
+    if (!data.sport) {
+      errors.push('Selecione um esporte');
+    }
+    if (!data.start_date || !data.end_date) {
+      errors.push('Datas de início e fim são obrigatórias');
+    }
+    if (data.start_date && data.end_date && new Date(data.start_date) >= new Date(data.end_date)) {
+      errors.push('Data de início deve ser anterior à data de fim');
+    }
+    if (!data.teams || data.teams.length < 2) {
+      errors.push('Selecione pelo menos dois times');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  },
+  prepareSubmission: (data: FormData, teams: Team[]) => {
+    const selectedTeamIds = data.teams.map(teamName => {
+      const team = teams.find(t => t.name === teamName);
+      return team ? team.id : null;
+    }).filter(id => id !== null);
+
+    return {
+      name: data.name,
+      description: `${data.description} (${SPORTS.find(s => s.id === parseInt(data.sport))?.name})`,
+      sport: parseInt(data.sport),
+      start_date: data.start_date,
+      end_date: data.end_date,
+      teams: selectedTeamIds
+    };
+  }
+};
 
 interface FormData {
   name: string;
@@ -74,6 +167,7 @@ const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
 };
 
 const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, children }) => {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
   const [formData, setFormData] = useState<FormData>({
@@ -85,12 +179,16 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, childre
     teams: []
   });
 
+  // Strategy selection based on form complexity
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+  const currentStrategy = isAdvancedMode ? AdvancedChampionshipStrategy : SimpleChampionshipStrategy;
+
   useEffect(() => {
     const fetchTeams = async () => {
       try {
         const response = await fetch('http://localhost:8000/teams/list/', {
           headers: {
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MDgzMjE5LCJpYXQiOjE3MzYwNzk2MTksImp0aSI6IjEzYWE2YzY5NTU1NTQ4OGZhMzM3NzM1MjZiZjg5MDM2IiwidXNlcl9pZCI6MX0.vQXUEOZzPuu03aibRt-FfYXfNKG4cZqxcsJGrX6_N4g`,
+            'Authorization': `Bearer ${user?.token}`,
             'Content-Type': 'application/json'
           }
         });
@@ -104,10 +202,10 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, childre
       }
     };
 
-    if (isModalOpen) {
+    if (isModalOpen && user?.token) {
       fetchTeams();
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, user?.token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -119,32 +217,34 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, childre
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
+
+    // Update strategy based on form complexity
+    if (name === 'description' || name === 'end_date') {
+      setIsAdvancedMode(!!value);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form using current strategy
+    const validation = currentStrategy.validateForm(formData);
+    if (!validation.isValid) {
+      alert(validation.errors?.join('\n'));
+      return;
+    }
+
     try {
-      // Mapeia os nomes dos times selecionados para seus IDs
-      const selectedTeamIds = formData.teams.map(teamName => {
-        const team = teams.find(t => t.name === teamName);
-        return team ? team.id : null;
-      }).filter(id => id !== null);
+      // Prepare submission data using current strategy
+      const submissionData = currentStrategy.prepareSubmission(formData, teams);
 
       const response = await fetch('http://localhost:8000/championships/create/', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MDgzMjE5LCJpYXQiOjE3MzYwNzk2MTksImp0aSI6IjEzYWE2YzY5NTU1NTQ4OGZhMzM3NzM1MjZiZjg5MDM2IiwidXNlcl9pZCI6MX0.vQXUEOZzPuu03aibRt-FfYXfNKG4cZqxcsJGrX6_N4g`,
+          'Authorization': `Bearer ${user?.token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description,
-          sport: parseInt(formData.sport),
-          start_date: formData.start_date,
-          end_date: formData.end_date,
-          teams: selectedTeamIds
-        })
+        body: JSON.stringify(submissionData)
       });
 
       if (!response.ok) {
@@ -200,7 +300,7 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, childre
             onChange={handleChange} 
             rows={1} 
             className={`${inputClassName} resize-none`}
-            required
+            required={isAdvancedMode}
           />
           
           <select 
@@ -231,7 +331,7 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, childre
             value={formData.end_date} 
             onChange={handleChange} 
             className={inputClassName}
-            required
+            required={isAdvancedMode}
           />
           
           <div className="relative">
@@ -249,7 +349,11 @@ const ChampionshipModal: React.FC<ChampionshipModalProps> = ({ onSubmit, childre
                 </option>
               ))}
             </select>
-            <small className="text-gray-400 block mt-1">Segure Ctrl para selecionar múltiplos times</small>
+            <small className="text-gray-400 block mt-1">
+              {isAdvancedMode 
+                ? 'Selecione pelo menos dois times'
+                : 'Selecione pelo menos um time'}
+            </small>
           </div>
           
           <button
