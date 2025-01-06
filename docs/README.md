@@ -26,7 +26,11 @@ Para iniciar o site localmente, utilize o comando:
 ```shell
 docsify serve ./docs
 ```
+### Branches com os códigos
 
+> [Front-End](https://github.com/UnBArqDsw2024-2/2024.2_G4_TorneioPro_Entrega_03/tree/Dev-Front) <br>
+[Back-End](https://github.com/UnBArqDsw2024-2/2024.2_G4_TorneioPro_Entrega_03/tree/Dev-Back) <br>
+[Banco](https://github.com/UnBArqDsw2024-2/2024.2_G4_TorneioPro_Entrega_03/tree/Dev-Banco) <br>
 
 ## Contribuidores
 
