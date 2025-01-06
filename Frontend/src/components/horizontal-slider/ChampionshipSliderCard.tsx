@@ -15,9 +15,22 @@ interface SliderCardProps {
     sport: string;
 }
 
-const ChampionshipSliderCard: React.FC<SliderCardProps> = ({index, openDate, closeDate, team1, team2, point1, point2, img1, img2, championship, sport}) => {
+const ChampionshipSliderCard: React.FC<SliderCardProps> = ({
+                                                               index,
+                                                               openDate,
+                                                               closeDate,
+                                                               team1,
+                                                               team2,
+                                                               point1,
+                                                               point2,
+                                                               img1,
+                                                               img2,
+                                                               championship,
+                                                               sport
+                                                           }) => {
     return (
-        <li key={index} className="inline-block p-4 lg:w-[18vw] w-[66vw] bg-slider-active rounded-[10px] lg:mr-3 mr-1.5 snap-center">
+        <li key={index}
+            className="inline-block p-4 lg:w-[18vw] w-[66vw] bg-slider-active rounded-[10px] lg:mr-3 mr-1.5 snap-center">
             <div className="flex flex-col justify-center items-center">
                 <ChampionshipSituationBadge openDate={openDate}
                                             closeDate={closeDate}/>

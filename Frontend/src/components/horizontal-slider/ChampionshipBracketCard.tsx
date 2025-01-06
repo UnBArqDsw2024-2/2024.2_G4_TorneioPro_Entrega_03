@@ -12,7 +12,7 @@ interface BracketCardProps {
     participants?: any[];
 }
 
-const ChampionshipBracketCard: React.FC<BracketCardProps> = ({ index, openDate, closeDate, championship, sport }) => {
+const ChampionshipBracketCard: React.FC<BracketCardProps> = ({index, openDate, closeDate, championship, sport}) => {
     return (
         <li
             key={index}
@@ -21,7 +21,7 @@ const ChampionshipBracketCard: React.FC<BracketCardProps> = ({ index, openDate, 
             <div className="flex flex-col justify-center items-center mb-4">
                 <ChampionshipSituationBadge openDate={openDate}
                                             closeDate={closeDate}/>
-                
+
                 <div className="flex flex-row justify-center items-center mt-8">
                     <div className="flex flex-col justify-center items-center">
                         <div className="flex flex-col justify-center items-center relative mb-3">
