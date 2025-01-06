@@ -1,4 +1,5 @@
 import React, { useState, ReactNode, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 interface FormData {
   name: string;
@@ -79,6 +80,7 @@ const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
 };
 
 const TeamModal: React.FC<TeamModalProps> = ({ onSubmit, children }) => {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [formData, setFormData] = useState<FormData>({
@@ -94,7 +96,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ onSubmit, children }) => {
       try {
         const response = await fetch('http://localhost:8000/trainers/list/', {
           headers: {
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MDUzMjY4LCJpYXQiOjE3MzYwNDk2NjgsImp0aSI6IjliM2Y3ODllMzQ0NDRjYjg4MDEyZTNmY2Q3NGJmNGRmIiwidXNlcl9pZCI6MX0.EqkPagY2jmxZyZTOPL7K2vJdiu0jHhzVRFdksidmd2k`,
+            'Authorization': `Bearer ${user?.token}`,
             'Content-Type': 'application/json'
           }
         });
@@ -127,10 +129,10 @@ const TeamModal: React.FC<TeamModalProps> = ({ onSubmit, children }) => {
       }
     };
 
-    if (isModalOpen) {
+    if (isModalOpen && user?.token) {
       fetchTrainers();
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, user?.token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -145,7 +147,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ onSubmit, children }) => {
       const response = await fetch('http://localhost:8000/teams/create/', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM2MDUzMjY4LCJpYXQiOjE3MzYwNDk2NjgsImp0aSI6IjliM2Y3ODllMzQ0NDRjYjg4MDEyZTNmY2Q3NGJmNGRmIiwidXNlcl9pZCI6MX0.EqkPagY2jmxZyZTOPL7K2vJdiu0jHhzVRFdksidmd2k`,
+          'Authorization': `Bearer ${user?.token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
