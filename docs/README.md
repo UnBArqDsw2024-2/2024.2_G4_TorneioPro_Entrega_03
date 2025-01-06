@@ -1,41 +1,35 @@
-# RepositorioTemplate
-Esse repositório é para ser utilizado pelos grupos como um template inicial.
-As seções do Template NÃO DEVEM SER OMITIDAS, sendo TODAS RELEVANTES.
-Demais diretrizes constam no Moodle.
+# TorneioPro
 
-**!! Atenção: Renomeie o seu repositório para (Ano.Semestre)_(Grupo)_(NomeDoProjeto)_(Entrega_03)*. !!** 
+## Introdução
 
-**!! *Não coloque os nomes dos alunos no título do repositório*. !!**
+Este repositório contém o projeto **TorneioPro**, desenvolvido pelo Grupo 4 da disciplina de **Arquitetura e Desenho de Software** 2024/2 do curso de Engenharia de Software da Universidade de Brasília (UnB). O projeto tem como objetivo fornecer uma solução completa para o gerenciamento de campeonatos esportivos, priorizando organização e acessibilidade.
 
-**!! *Exemplo de título correto: 2024.2_G1_Jogo_Entrega_03*. !!** 
- 
- (Apague esses comentários)
+## Tecnologias Utilizadas
 
-# Nome do Projeto
+A documentação e a interface do TorneioPro são geradas dinamicamente usando [Docsify](https://docsify.js.org/), uma ferramenta que carrega e interpreta arquivos Markdown para exibir um site de documentação.
 
-**Código da Disciplina**: FGA0208<br>
-**Número do Grupo**: XX<br>
-**Entrega**: 03<br>
+Você pode acessar em [TorneioPro](https://unbarqdsw2024-2.github.io/2024.2_G4_TorneioPro_Entrega_03/)
 
-## Alunos
-|Matrícula | Aluno |
-| -- | -- |
-| xx/xxxxxx  |  xxxx xxxx xxxxx |
-| xx/xxxxxx  |  xxxx xxxx xxxxx |
+### Instalando o Docsify
 
-## Sobre 
-Contextualize, usando referências, links, e outros materiais como fontes.
+Para instalar o Docsify CLI globalmente, execute:
 
-## Screenshots da Terceira Entrega
-Adicione 2 ou mais screenshots em termos de artefatos realizados na entrega.
+```shell
+npm i docsify-cli -g
 
-## Há algo a ser executado?
+```
 
-( ) SIM
+### Executando localmente
 
-( ) NÃO
+Para iniciar o site localmente, utilize o comando:
 
-Se SIM, insira um manual (ou um script) para auxiliar ainda mais os interessados na execução.
+```shell
+docsify serve ./docs
+```
 
-## Informações Complementares 
-Quaisquer outras informações adicionais podem ser descritas nessa seção.
+
+## Contribuidores
+
+<a href="https://github.com/UnBArqDsw2024-2/2024.2_G4_Esporte_Entrega_01/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=UnBArqDsw2024-2/2024.2_G4_Esporte_Entrega_01" />
+</a>
